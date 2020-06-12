@@ -16,7 +16,6 @@
     <PackageReference Include="Blazorise.Components" Version="0.9.0.3" />
     <PackageReference Include="AspNetMonsters.Blazor.Geolocation" Version="0.5.0-preview1" />
     <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.7" />
-    <PackageReference Include="BlazorLeaflet" Version="0.4.0-alpha" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,6 +25,7 @@
   <ItemGroup>
     <Folder Include="DTO\" />
     <Folder Include="Components\" />
+    <Folder Include="Services\" />
   </ItemGroup>
   <ItemGroup>
     <Content Remove="Components\Map.cshtml" />

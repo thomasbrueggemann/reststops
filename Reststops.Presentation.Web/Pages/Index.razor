@@ -8,24 +8,30 @@
 @inject LocationService LocationService
 @inject IJSRuntime jsRuntime
 
-<Autocomplete Data="@autocompleteData"
-              TextField="@((item) => item.Text)"
-              ValueField="@((item) => item.Text)"
-              SelectedValue="@selectedSearchValue"
-              SelectedValueChanged="@MySearchHandler"
-              SearchChanged="@SearchChangedHandler"
-              Placeholder="Search for a destination..." />
+<section class="section">
+    <Autocomplete
+        Data="@autocompleteData"
+        Size="Size.Medium"
+        TextField="@((item) => item.Text)"
+        ValueField="@((item) => item.Value)"
+        SelectedValue="@selectedDestinationValue"
+        SelectedValueChanged="@DestinationSelected"
+        SearchChanged="@DestinationSearchChanged"
+        Placeholder="Your destination?"
+        Class="destinationTxt" />
+</section>
 
-<hr />
-<br />
-Lat: @location?.Latitude
-<br />
-Long: @location?.Longitude
-<br />
-Accuracy: @location?.Accuracy
-<br />
-<Map></Map>
-<hr />
+<MiniMap
+    StartLatitude="@startLatitude"
+    StartLongitude="@startLongitude"
+    EndLatitude="@endLatitude"
+    EndLongitude="@endLongitude"
+    RouteEncodedPolyline="@routeEncodedPolyline" />
+
+<section class="section">
+    
+</section>
+
 
 @code{
     public class DestinationSelectModel
@@ -34,41 +40,62 @@ Accuracy: @location?.Accuracy
         public string Text { get; set; }
     }
 
-    IEnumerable<DestinationSelectModel> autocompleteData;
-    Location location;
-    ReststopsResult reststops = new ReststopsResult();
+    private bool searchButtonDisabled = true;
+    private IEnumerable<DestinationSelectModel> autocompleteData;
+    private double? startLatitude;
+    private double? startLongitude;
+    private double? endLatitude;
+    private double? endLongitude;
+    private string routeEncodedPolyline;
+    private ReststopsResult reststops = new ReststopsResult();
+    private double[] selectedDestinationValue { get; set; }
 
-    object selectedSearchValue { get; set; }
-
-    private async Task SearchChangedHandler(string text)
+    private async Task DestinationSearchChanged(string text)
     {
         if (!string.IsNullOrWhiteSpace(text))
         {
-            var result = await Http.GetFromJsonAsync<MapboxPlacesResult>(
-                $"http://localhost:3736/places?text={text}"
+            var result = await Http.GetFromJsonAsync<IEnumerable<PlacesResult>>(
+                $"{Constants.API_BASEURL}/places?text={text}"
             );
 
-            autocompleteData = result.features.Select(f => new DestinationSelectModel
+            autocompleteData = result.Select(f => new DestinationSelectModel
             {
-                Text = f.place_name,
-                Value = f.center
+                Text = f.Name,
+                Value = new double[2] { f.Longitude, f.Latitude }
             });
         }
     }
 
-    protected override async Task OnInitializedAsync()
+    private void CheckSearchButtonDisabled()
     {
-        location = await LocationService.GetLocationAsync();
+        searchButtonDisabled = !startLongitude.HasValue ||
+                                !startLatitude.HasValue ||
+                                selectedDestinationValue == null;
     }
 
-    private async Task MySearchHandler(object value)
+    protected override async Task OnInitializedAsync()
     {
-        selectedSearchValue = value;
-        location = await LocationService.GetLocationAsync();
+        var location = await LocationService.GetLocationAsync();
+        startLatitude = (double?)location.Latitude;
+        startLongitude = (double?)location.Longitude;
+
+        CheckSearchButtonDisabled();
+    }
+
+    private async Task DestinationSelected(object value)
+    {
+        selectedDestinationValue = value as double[];
+
+        endLongitude = selectedDestinationValue[0];
+        endLatitude = selectedDestinationValue[1];
 
         reststops = await Http.GetFromJsonAsync<ReststopsResult>(
-            $"http://localhost:3736/reststops?startLat={location.Latitude}&startLon={location.Longitude}&" +
+            $"{Constants.API_BASEURL}/reststops?startLat={startLatitude}&startLon={startLongitude}&" +
             $"endLat=54.126163&endLon=12.152938"
         );
+
+        routeEncodedPolyline = reststops.Route;
+
+        CheckSearchButtonDisabled();
     }
 }

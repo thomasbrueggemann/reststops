@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using AspNetMonsters.Blazor.Geolocation;
+using Reststops.Presentation.Web.Services;
 
 namespace Reststops.Presentation.Web
 {
@@ -19,6 +20,7 @@ namespace Reststops.Presentation.Web
            
             builder.Services
                 .AddScoped<LocationService>()
+                .AddScoped<BrowserService>()
                 .AddTransient(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) })
                 .AddBlazorise(options =>
                 {

@@ -1,3 +1,23 @@
 ﻿.desc > .fas {
     margin: 0 7px;
 }
+
+.destinationTxt {
+    margin-bottom: 6px;
+}
+
+.destinationTxt,
+.destinationTxt .control,
+.destinationTxt .input {
+    width: 100% !important;
+}
+
+.navbar-brand {
+    font-weight: bolder;
+    padding: 15px;
+    position: absolute;
+}
+
+section {
+    padding: 1rem 1.5rem !important;
+}
