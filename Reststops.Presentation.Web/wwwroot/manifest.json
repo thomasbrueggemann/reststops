@@ -1,6 +1,6 @@
 {
-  "name": "Reststops.Presentation.Web",
-  "short_name": "Reststops.Presentation.Web",
+  "name": "Reststops",
+  "short_name": "Reststops",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#ffffff",

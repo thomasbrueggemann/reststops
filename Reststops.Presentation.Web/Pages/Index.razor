@@ -1,7 +1,74 @@
 ﻿@page "/"
 
-<h1>Hello, world!</h1>
+@using System.Net.Http
+@using Reststops.Presentation.Web.DTO
+@using AspNetMonsters.Blazor.Geolocation
 
-Welcome to your new app.
+@inject HttpClient Http
+@inject LocationService LocationService
+@inject IJSRuntime jsRuntime
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+<Autocomplete Data="@autocompleteData"
+              TextField="@((item) => item.Text)"
+              ValueField="@((item) => item.Text)"
+              SelectedValue="@selectedSearchValue"
+              SelectedValueChanged="@MySearchHandler"
+              SearchChanged="@SearchChangedHandler"
+              Placeholder="Search for a destination..." />
+
+<hr />
+<br />
+Lat: @location?.Latitude
+<br />
+Long: @location?.Longitude
+<br />
+Accuracy: @location?.Accuracy
+<br />
+<Map></Map>
+<hr />
+
+@code{
+    public class DestinationSelectModel
+    {
+        public double[] Value { get; set; }
+        public string Text { get; set; }
+    }
+
+    IEnumerable<DestinationSelectModel> autocompleteData;
+    Location location;
+    ReststopsResult reststops = new ReststopsResult();
+
+    object selectedSearchValue { get; set; }
+
+    private async Task SearchChangedHandler(string text)
+    {
+        if (!string.IsNullOrWhiteSpace(text))
+        {
+            var result = await Http.GetFromJsonAsync<MapboxPlacesResult>(
+                $"http://localhost:3736/places?text={text}"
+            );
+
+            autocompleteData = result.features.Select(f => new DestinationSelectModel
+            {
+                Text = f.place_name,
+                Value = f.center
+            });
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        location = await LocationService.GetLocationAsync();
+    }
+
+    private async Task MySearchHandler(object value)
+    {
+        selectedSearchValue = value;
+        location = await LocationService.GetLocationAsync();
+
+        reststops = await Http.GetFromJsonAsync<ReststopsResult>(
+            $"http://localhost:3736/reststops?startLat={location.Latitude}&startLon={location.Longitude}&" +
+            $"endLat=54.126163&endLon=12.152938"
+        );
+    }
+}

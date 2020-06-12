@@ -11,10 +11,23 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Build" Version="3.2.0" PrivateAssets="all" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="3.2.0" PrivateAssets="all" />
     <PackageReference Include="System.Net.Http.Json" Version="3.2.0" />
+    <PackageReference Include="Blazorise.Bulma" Version="0.9.0.3" />
+    <PackageReference Include="Blazorise.Icons.FontAwesome" Version="0.9.0.3" />
+    <PackageReference Include="Blazorise.Components" Version="0.9.0.3" />
+    <PackageReference Include="AspNetMonsters.Blazor.Geolocation" Version="0.5.0-preview1" />
+    <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.7" />
+    <PackageReference Include="BlazorLeaflet" Version="0.4.0-alpha" />
   </ItemGroup>
 
   <ItemGroup>
     <ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="DTO\" />
+    <Folder Include="Components\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Remove="Components\Map.cshtml" />
+  </ItemGroup>
 </Project>

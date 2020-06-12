@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  reststops.presentation.api:
+    image: ${DOCKER_REGISTRY-}reststopspresentation
+    build:
+      context: .
+      dockerfile: Reststops.Presentation.API/Dockerfile

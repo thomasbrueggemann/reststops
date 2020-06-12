@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.Azure.Cosmos.Spatial;
 using Newtonsoft.Json;
 
@@ -7,7 +8,8 @@ namespace Reststops.Infrastructure.Data.DAO
     public class ReststopDAO
     {
         [JsonProperty("id")]
-        public ulong ID { get; set; }
+        [Key]
+        public string ID { get; set; }
 
         [JsonProperty("name")]
         public string Name { get; set; }

@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.5" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="reststops.json" />
@@ -22,8 +23,8 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Reststops.Core.Entities\Reststops.Core.Entities.csproj" />
-    <ProjectReference Include="..\Reststops.Infrastructure.Data\Reststops.Infrastructure.Data.csproj" />
-    <ProjectReference Include="..\Reststops.Core.Entities\Reststops.Core.Domain.csproj" />
+    <ProjectReference Include="..\Reststops.Core.Application\Reststops.Core.csproj" />
+    <ProjectReference Include="..\Reststops.Core.Entities\Reststops.Domain.csproj" />
+    <ProjectReference Include="..\Reststops.Infrastructure.Data\Reststops.Infrastructure.csproj" />
   </ItemGroup>
 </Project>

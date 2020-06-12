@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reststops.Core", "Reststops
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reststops.Domain", "Reststops.Core.Entities\Reststops.Domain.csproj", "{D29DFD0A-A224-43E1-B63B-38B5A0384617}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reststops.Presentation.API", "Reststops.Presentation.API\Reststops.Presentation.API.csproj", "{344DFE6F-DCA4-4C07-BACD-2D93D213A506}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{9306443E-1595-4243-94E5-C47AECB9965C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,5 +41,13 @@ Global
 		{D29DFD0A-A224-43E1-B63B-38B5A0384617}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D29DFD0A-A224-43E1-B63B-38B5A0384617}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D29DFD0A-A224-43E1-B63B-38B5A0384617}.Release|Any CPU.Build.0 = Release|Any CPU
+		{344DFE6F-DCA4-4C07-BACD-2D93D213A506}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{344DFE6F-DCA4-4C07-BACD-2D93D213A506}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{344DFE6F-DCA4-4C07-BACD-2D93D213A506}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{344DFE6F-DCA4-4C07-BACD-2D93D213A506}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9306443E-1595-4243-94E5-C47AECB9965C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9306443E-1595-4243-94E5-C47AECB9965C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9306443E-1595-4243-94E5-C47AECB9965C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9306443E-1595-4243-94E5-C47AECB9965C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

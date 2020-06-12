@@ -1,12 +1,12 @@
+using Blazorise;
+using Blazorise.Bulma;
+using Blazorise.Icons.FontAwesome;
 using System;
 using System.Net.Http;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Text;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+using AspNetMonsters.Blazor.Geolocation;
 
 namespace Reststops.Presentation.Web
 {
@@ -16,10 +16,24 @@ namespace Reststops.Presentation.Web
         {
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("app");
+           
+            builder.Services
+                .AddScoped<LocationService>()
+                .AddTransient(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) })
+                .AddBlazorise(options =>
+                {
+                    options.ChangeTextOnKeyPress = true;
+                })
+                .AddBulmaProviders()
+                .AddFontAwesomeIcons();
 
-            builder.Services.AddTransient(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+            var host = builder.Build();
 
-            await builder.Build().RunAsync();
+            host.Services
+                .UseBulmaProviders()
+                .UseFontAwesomeIcons();
+
+            await host.RunAsync();
         }
     }
 }

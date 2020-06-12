@@ -2,10 +2,16 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using AutoMapper;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Reststops.Core.Interfaces.Repositories;
 using Reststops.Domain.Entities;
 using Reststops.Domain.Enums;
+using Reststops.Infrastructure.Data;
+using Reststops.Infrastructure.Data.DAO;
+using Reststops.Infrastructure.Repositories;
 
 namespace Reststops.Services.Import
 {
@@ -13,31 +19,83 @@ namespace Reststops.Services.Import
     {
         static async Task<int> Main(string[] args)
         {
+            #region Setup DI
+
+            //setup our DI
+            var services = new ServiceCollection()
+                .AddAutoMapper(
+                    typeof(EntityDAOMappingProfile)
+                )
+                .AddInfrastructure()
+                .BuildServiceProvider();
+
+            #endregion
+
             string jsonString = await File.ReadAllTextAsync("reststops.json");
-
             dynamic data = JsonConvert.DeserializeObject(jsonString);
+            var reststopRepository = services.GetService<IReststopRepository>();
 
-            foreach(var element in data.elements)
+            int insertCount = 0;
+
+            Func<dynamic, double?> GetLatitude = (dynamic element) =>
+            {
+                if (element.center != null && element.center.lat != null)
+                    return (double) element.center.lat;
+               
+                if(element.lat != null) return (double) element.lat;
+
+                return null;
+            };
+
+            Func<dynamic, double?> GetLongitude = (dynamic element) =>
+            {
+                if (element.center != null && element.center.lon != null)
+                    return (double) element.center.lon;
+
+                if (element.lon != null) return (double) element.lon;
+
+                return null;
+            };
+
+            foreach (var element in data.elements)
             {
                 try
                 {
-                    if (element.lat == null || element.lon == null) continue;
+                    if (element.id == 369970104)
+                    {
+                        Console.WriteLine();
+                    }
 
-                    var tags = ((JObject)element.tags).ToObject<Dictionary<string, string>>();
+                    double? lat = GetLatitude(element);
+                    double? lon = GetLongitude(element);
+
+                    if (!lat.HasValue || !lon.HasValue) continue;
+
+                    var tags = ((JObject) element.tags).ToObject<Dictionary<string, string>>();
 
                     var reststop = new Reststop
                     (
-                        ID: (ulong)element.id,
+                        ID: (ulong) element.id,
                         Name: tags.GetValueOrDefault("name", null),
-                        Latitude: (decimal)element.lat,
-                        Longitude: (decimal)element.lon,
+                        Latitude: lat.Value,
+                        Longitude: lon.Value,
                         Type: tags.GetValueOrDefault("highway", "rest_area") == "services"
                                 ? ReststopType.ServiceArea
                                 : ReststopType.RestArea,
                         Tags: tags
                     );
 
-                    Console.WriteLine(reststop.ID);
+                    Console.WriteLine(reststop.ID);    
+
+                    await reststopRepository.Insert(reststop);
+                    insertCount++;
+
+                    // every 350 items, wait a second to not exceed
+                    // 400 requests / second on the database
+                    if (insertCount % 350 == 0)
+                    {
+                        await Task.Delay(1000);
+                    }
                 }
                 catch(Exception e)
                 {
