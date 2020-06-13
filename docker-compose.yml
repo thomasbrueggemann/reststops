@@ -6,3 +6,10 @@ services:
     build:
       context: .
       dockerfile: Reststops.Presentation.API/Dockerfile
+
+  reststops.presentation.web:
+    image: ${DOCKER_REGISTRY-}reststopspresentation
+    build:
+      context: .
+      dockerfile: Reststops.Presentation.Web/Dockerfile
+

@@ -37,3 +37,4 @@ msbuild.wrn
 .vs/
 dev.env
 Reststops.Presentation.API/dev.env
+dist/

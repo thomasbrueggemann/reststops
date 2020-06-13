@@ -142,8 +142,6 @@ namespace Reststops.Core
 
             private double _strokeOpacity;
             private string _strokeColor;
-            private string _fillColor;
-            private double _fillOpacity;
 
             #endregion
 
