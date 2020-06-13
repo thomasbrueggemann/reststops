@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Reststops.Domain.Enums;
+using Reststops.Core.Enums;
 
-namespace Reststops.Domain.Entities
+namespace Reststops.Core.Entities
 {
     public class Reststop
     {

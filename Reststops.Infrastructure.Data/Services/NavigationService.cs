@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using NetTopologySuite.Geometries;
 using Newtonsoft.Json;
 using Reststops.Core.Interfaces.Services;
-using Reststops.Domain.Entities;
+using Reststops.Core.Entities;
 
 namespace Reststops.Infrastructure.Services
 {

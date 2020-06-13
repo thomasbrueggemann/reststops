@@ -3,33 +3,44 @@
 @using System.Net.Http
 @using Reststops.Presentation.Web.DTO
 @using AspNetMonsters.Blazor.Geolocation
+@using Reststops.Core.Entities
 
 @inject HttpClient Http
 @inject LocationService LocationService
 @inject IJSRuntime jsRuntime
 
+<Bar Breakpoint="Breakpoint.Desktop" Background="Background.Light" ThemeContrast="ThemeContrast.Light">
+    <BarBrand>
+        🏞 Reststops
+    </BarBrand>
+
+        <BarItem Float="Float.Right">
+            <BarLink @onclick="UpdateReststops">
+                <i class="fas fa-sync"></i>
+            </BarLink>
+        </BarItem>
+</Bar>
+
 <section class="section">
-    <Autocomplete
-        Data="@autocompleteData"
-        Size="Size.Medium"
-        TextField="@((item) => item.Text)"
-        ValueField="@((item) => item.Value)"
-        SelectedValue="@selectedDestinationValue"
-        SelectedValueChanged="@DestinationSelected"
-        SearchChanged="@DestinationSearchChanged"
-        Placeholder="Your destination?"
-        Class="destinationTxt" />
+    <Autocomplete Data="@autocompleteData"
+                  Size="Size.Medium"
+                  TextField="@((item) => item.Text)"
+                  ValueField="@((item) => item.Value)"
+                  SelectedValue="@selectedDestinationValue"
+                  SelectedValueChanged="@DestinationSelected"
+                  SearchChanged="@DestinationSearchChanged"
+                  Placeholder="Your destination?"
+                  Class="destinationTxt" />
 </section>
 
-<MiniMap
-    StartLatitude="@startLatitude"
-    StartLongitude="@startLongitude"
-    EndLatitude="@endLatitude"
-    EndLongitude="@endLongitude"
-    RouteEncodedPolyline="@routeEncodedPolyline" />
+<MiniMap StartLatitude="@startLatitude"
+         StartLongitude="@startLongitude"
+         EndLatitude="@endLatitude"
+         EndLongitude="@endLongitude"
+         RouteEncodedPolyline="@routeEncodedPolyline" />
 
 <section class="section">
-    
+    <ResultsList Reststops="@reststops?.Reststops" />
 </section>
 
 
@@ -40,6 +51,8 @@
         public string Text { get; set; }
     }
 
+    #region Private Members
+
     private bool searchButtonDisabled = true;
     private IEnumerable<DestinationSelectModel> autocompleteData;
     private double? startLatitude;
@@ -47,8 +60,31 @@
     private double? endLatitude;
     private double? endLongitude;
     private string routeEncodedPolyline;
-    private ReststopsResult reststops = new ReststopsResult();
-    private double[] selectedDestinationValue { get; set; }
+    private ReststopsResult reststops;
+    private double[] selectedDestinationValue;
+
+    #endregion
+
+    #region Lifecycle Events
+
+    protected override async Task OnInitializedAsync()
+    {
+        await UpdateLocation();
+
+        CheckSearchButtonDisabled();
+    }
+
+    #endregion
+
+    #region Private Methods
+
+    private async Task UpdateLocation()
+    {
+        var location = await LocationService.GetLocationAsync();
+
+        startLatitude = (double?)location.Latitude;
+        startLongitude = (double?)location.Longitude;
+    }
 
     private async Task DestinationSearchChanged(string text)
     {
@@ -73,15 +109,6 @@
                                 selectedDestinationValue == null;
     }
 
-    protected override async Task OnInitializedAsync()
-    {
-        var location = await LocationService.GetLocationAsync();
-        startLatitude = (double?)location.Latitude;
-        startLongitude = (double?)location.Longitude;
-
-        CheckSearchButtonDisabled();
-    }
-
     private async Task DestinationSelected(object value)
     {
         selectedDestinationValue = value as double[];
@@ -89,13 +116,24 @@
         endLongitude = selectedDestinationValue[0];
         endLatitude = selectedDestinationValue[1];
 
-        reststops = await Http.GetFromJsonAsync<ReststopsResult>(
-            $"{Constants.API_BASEURL}/reststops?startLat={startLatitude}&startLon={startLongitude}&" +
-            $"endLat=54.126163&endLon=12.152938"
-        );
-
-        routeEncodedPolyline = reststops.Route;
+        await UpdateReststops();
 
         CheckSearchButtonDisabled();
     }
+
+    private async Task UpdateReststops()
+    {
+        Console.WriteLine("UpdateReststops");
+
+        await UpdateLocation();
+
+        reststops = await Http.GetFromJsonAsync<ReststopsResult>(
+            $"{Constants.API_BASEURL}/reststops?startLat={startLatitude}&startLon={startLongitude}&" +
+            $"endLat={endLatitude}&endLon={endLongitude}"
+        );
+
+        routeEncodedPolyline = EncodedPolyline.Simplify(reststops.Route);
+    }
+
+    #endregion
 }

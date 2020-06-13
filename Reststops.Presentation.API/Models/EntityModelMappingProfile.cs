@@ -1,7 +1,7 @@
 ﻿using System;
 using AutoMapper;
-using Reststops.Domain.Entities;
-using Reststops.Domain.Enums;
+using Reststops.Core.Entities;
+using Reststops.Core.Enums;
 
 namespace Reststops.Presentation.API.Models
 {

@@ -1,21 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using NetTopologySuite.Geometries;
 
-namespace Reststops.Domain.Entities
+namespace Reststops.Core.Entities
 {
     /// <summary>
     /// See https://developers.google.com/maps/documentation/utilities/polylinealgorithm
     /// </summary>
     public static class EncodedPolyline
     {
-        /// <summary>
-        /// Decode google style polyline coordinates.
-        /// </summary>
-        /// <param name="encodedPoints"></param>
-        /// <returns></returns>
+        #region Public Methods
+
         public static IEnumerable<Coordinate> Decode(string encodedPoints)
         {
             if (string.IsNullOrEmpty(encodedPoints))
@@ -71,11 +67,6 @@ namespace Reststops.Domain.Entities
             }
         }
 
-        /// <summary>
-        /// Encode it
-        /// </summary>
-        /// <param name="points"></param>
-        /// <returns></returns>
         public static string Encode(IEnumerable<Coordinate> points)
         {
             var str = new StringBuilder();
@@ -115,5 +106,20 @@ namespace Reststops.Domain.Entities
 
             return str.ToString();
         }
+
+        public static string Simplify(string encodedPoints)
+        {
+            IEnumerable<Coordinate> decodedCoordinates = Decode(encodedPoints);
+            var decodedPolyline = new Polyline(decodedCoordinates);
+
+            var simplifiedPolyline = decodedPolyline.Simplify(
+                pixelTolerance: 0.05,
+                highQuality: false
+            );
+
+            return Encode(simplifiedPolyline.GetCoordinates());
+        }
+
+        #endregion
     }
 }

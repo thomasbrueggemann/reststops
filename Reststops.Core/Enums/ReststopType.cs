@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Reststops.Domain.Enums
+﻿namespace Reststops.Core.Enums
 {
     public enum ReststopType
     {

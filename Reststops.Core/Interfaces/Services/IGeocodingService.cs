@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Reststops.Domain.Entities;
+using Reststops.Core.Entities;
 
 namespace Reststops.Core.Interfaces.Services
 {

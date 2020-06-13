@@ -14,10 +14,7 @@
     <ProjectReference Include="..\Reststops.Infrastructure.Data\Reststops.Infrastructure.csproj">
       <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
     </ProjectReference>
-    <ProjectReference Include="..\Reststops.Core.Entities\Reststops.Domain.csproj">
-      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
-    </ProjectReference>
-    <ProjectReference Include="..\Reststops.Core.Application\Reststops.Core.csproj">
+    <ProjectReference Include="..\Reststops.Core\Reststops.Core.csproj">
       <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
     </ProjectReference>
   </ItemGroup>

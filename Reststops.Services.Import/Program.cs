@@ -7,11 +7,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Reststops.Core.Interfaces.Repositories;
-using Reststops.Domain.Entities;
-using Reststops.Domain.Enums;
+using Reststops.Core.Entities;
+using Reststops.Core.Enums;
 using Reststops.Infrastructure.Data;
 using Reststops.Infrastructure.Data.DAO;
-using Reststops.Infrastructure.Repositories;
 
 namespace Reststops.Services.Import
 {

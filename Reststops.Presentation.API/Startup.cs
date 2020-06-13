@@ -30,7 +30,10 @@ namespace Reststops.Presentation.API
                         builder.WithOrigins("http://localhost:5000",
                                             "https://reststops.app",
                                             "https://app.reststops.app",
-                                            "https://www.reststops.app");
+                                            "https://www.reststops.app")
+                            .AllowAnyHeader()
+                            .AllowAnyMethod()
+                            .AllowCredentials();
                     });
             });
 

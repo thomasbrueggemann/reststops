@@ -17,7 +17,6 @@
     <PackageReference Include="Microsoft.Azure.DocumentDB.Core" Version="2.11.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Reststops.Core.Entities\Reststops.Domain.csproj" />
-    <ProjectReference Include="..\Reststops.Core.Application\Reststops.Core.csproj" />
+    <ProjectReference Include="..\Reststops.Core\Reststops.Core.csproj" />
   </ItemGroup>
 </Project>

@@ -1,4 +1,5 @@
 ﻿@using Reststops.Presentation.Web.Services;
+@using Reststops.Core;
 
 @inject BrowserService browserService
 
@@ -25,13 +26,13 @@
 
         var staticMap = new MapboxStaticMap(Constants.MAPBOX_TOKEN)
             .SetStyle("streets-v11")
-            .SetDimensions(width, 250);
+            .SetDimensions(width, 300);
 
         if (StartLatitude.HasValue && StartLongitude.HasValue)
         {
             staticMap.AddMarker(new MapboxStaticMap.Marker()
             {
-                ColorCode = "00FFFF",
+                ColorCode = "77E105",
                 Label = "1",
                 Type = MapboxStaticMap.MarkerType.PIN_L,
                 Latitude = StartLatitude.Value,
@@ -53,14 +54,14 @@
 
         if (!string.IsNullOrWhiteSpace(RouteEncodedPolyline))
         {
+            Console.WriteLine("addpath");
+
             staticMap.AddPath(new MapboxStaticMap.Path()
             {
                 Polyline = RouteEncodedPolyline,
                 StrokeColor = "FF0000",
                 StrokeWidth = 3,
-                StrokeOpacity = 0.8,
-                FillColor = "FF0000",
-                FillOpacity = 0.6
+                StrokeOpacity = 0.8
             });
         }
 

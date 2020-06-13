@@ -4,9 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Reststops.Presentation.Web
+namespace Reststops.Core
 {
-
     public class MapboxStaticMap
     {
         private StringBuilder _url;
@@ -170,24 +169,6 @@ namespace Reststops.Presentation.Web
                 }
             }
 
-            public string FillColor
-            {
-                get
-                {
-                    return _fillColor;
-                }
-                set
-                {
-                    var validationRegex = new Regex("^(?:[0-9a-fA-F]{3}){1,2}$");
-                    if (!validationRegex.IsMatch(value))
-                    {
-                        throw new ArgumentException($"{value} is not a 3- or 6-digit hexadecimal color code");
-                    }
-
-                    _fillColor = value;
-                }
-            }
-
             public double StrokeOpacity
             {
                 get
@@ -205,23 +186,6 @@ namespace Reststops.Presentation.Web
                 }
             }
 
-            public double FillOpacity
-            {
-                get
-                {
-                    return _fillOpacity;
-                }
-                set
-                {
-                    if (value < 0 || value > 1)
-                    {
-                        throw new ArgumentException("FillOpacity must be a value between 0 and 1");
-                    }
-
-                    _fillOpacity = value;
-                }
-            }
-
             public string Polyline { get; set; }
 
             #endregion
@@ -230,7 +194,7 @@ namespace Reststops.Presentation.Web
 
             public override string ToString()
             {
-                return $"path-{StrokeWidth}+{StrokeColor}-{StrokeOpacity}+{FillColor}-{FillOpacity}({Polyline})";
+                return $"path-{StrokeWidth}+{StrokeColor}-{StrokeOpacity}({Polyline})";
             }
 
             #endregion
@@ -282,7 +246,7 @@ namespace Reststops.Presentation.Web
         public override string ToString()
         {
             // add style
-            _url.Append($"streets-v11/static/");
+            _url.Append($"{_style}/static/");
 
             // add markers
             _url.Append(string.Join(',',

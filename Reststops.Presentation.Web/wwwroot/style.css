@@ -21,3 +21,8 @@
 section {
     padding: 1rem 1.5rem !important;
 }
+
+.dropdown-menu {
+    width: 100% !important;
+    overflow: hidden;
+}

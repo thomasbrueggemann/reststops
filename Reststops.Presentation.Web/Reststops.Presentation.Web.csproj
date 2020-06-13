@@ -30,4 +30,9 @@
   <ItemGroup>
     <Content Remove="Components\Map.cshtml" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Reststops.Core\Reststops.Core.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
+  </ItemGroup>
 </Project>

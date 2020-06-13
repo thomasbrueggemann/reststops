@@ -9,8 +9,7 @@ FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
 WORKDIR /src
 COPY Reststops.Presentation.API/Reststops.Presentation.API.csproj Reststops.Presentation.API/
 COPY Reststops.Infrastructure.Data/Reststops.Infrastructure.csproj Reststops.Infrastructure.Data/
-COPY Reststops.Core.Entities/Reststops.Domain.csproj Reststops.Core.Entities/
-COPY Reststops.Core.Application/Reststops.Core.csproj Reststops.Core.Application/
+COPY Reststops.Core/Reststops.Core.csproj Reststops.Core/
 RUN dotnet restore "Reststops.Presentation.API/Reststops.Presentation.API.csproj"
 COPY . .
 WORKDIR "/src/Reststops.Presentation.API"

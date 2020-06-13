@@ -2,8 +2,8 @@
 using System;
 using AutoMapper;
 using Microsoft.Azure.Cosmos.Spatial;
-using Reststops.Domain.Entities;
-using Reststops.Domain.Enums;
+using Reststops.Core.Entities;
+using Reststops.Core.Enums;
 
 namespace Reststops.Infrastructure.Data.DAO
 {

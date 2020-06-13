@@ -1,4 +1,4 @@
-﻿namespace Reststops.Domain.Entities
+﻿namespace Reststops.Core.Entities
 {
     public class ForwardGeocoding
     {

@@ -5,7 +5,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Reststops.Core.Interfaces.Services;
-using Reststops.Domain.Entities;
+using Reststops.Core.Entities;
 using Reststops.Presentation.API.Models;
 
 namespace Reststops.Presentation.API.Controllers

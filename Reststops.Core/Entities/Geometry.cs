@@ -2,7 +2,7 @@
 using System.Linq;
 using NetTopologySuite.Geometries;
 
-namespace Reststops.Domain.Entities
+namespace Reststops.Core.Entities
 {
     public class Geometry
     {

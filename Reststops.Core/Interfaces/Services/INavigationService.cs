@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using NetTopologySuite.Geometries;
-using Reststops.Domain.Entities;
+using Reststops.Core.Entities;
 
 namespace Reststops.Core.Interfaces.Services
 {

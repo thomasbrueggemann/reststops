@@ -3,7 +3,7 @@ using System.Linq;
 using AutoMapper;
 using Reststops.Core.Interfaces.Repositories;
 using System.Threading.Tasks;
-using Reststops.Domain.Entities;
+using Reststops.Core.Entities;
 using Reststops.Infrastructure.Data.DAO;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Linq;
