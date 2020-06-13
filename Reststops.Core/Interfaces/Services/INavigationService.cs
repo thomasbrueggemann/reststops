@@ -8,13 +8,7 @@ namespace Reststops.Core.Interfaces.Services
     public interface INavigationService
     {
         public Task<DirectionsRoute> GetDirections(
-            Coordinate startCoordinate,
-            Coordinate endCoordinate
-        );
-
-        public Task<DirectionsMatrix> GetMatrix(
-            Coordinate source,
-            IEnumerable<Coordinate> destinations
+            IEnumerable<Coordinate> coordinates
         );
     }
 }

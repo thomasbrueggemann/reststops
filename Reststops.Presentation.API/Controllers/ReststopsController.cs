@@ -44,15 +44,15 @@ namespace Reststops.Presentation.API.Controllers
             [FromQuery] double startLon,
             [FromQuery] double startLat,
             [FromQuery] double endLon,
-            [FromQuery] double endLat
+            [FromQuery] double endLat,
+            [FromQuery] int maxDetourInSeconds = 300
         )
         {
             var startCoordinate = new Coordinate(startLon, startLat);
             var endCoordinate = new Coordinate(endLon, endLat);
 
             DirectionsRoute route = await _navigationService.GetDirections(
-                startCoordinate,
-                endCoordinate
+                new List<Coordinate>() { startCoordinate, endCoordinate}
             );
 
             if (route == null || route.Routes.Count == 0)
@@ -68,18 +68,21 @@ namespace Reststops.Presentation.API.Controllers
                     bufferedPolygon
                 );
 
-            DirectionsMatrix matrix = await _navigationService.GetMatrix(
-                startCoordinate,
-                reststops.Select(r => new Coordinate(r.Longitude, r.Latitude))
-            );
-
             // map entities to api models
             var reststopModels = _mapper.Map<IEnumerable<ReststopModel>>(
                 reststops
             );
 
-            reststopModels = AddDistanceAndDurationValuesToModels(matrix, reststopModels);
-            reststopModels = reststopModels.OrderBy(m => m.DistanceInMeters);
+            reststopModels = await AddDistanceAndDetourDurationToModels(
+                reststopModels,
+                startCoordinate,
+                endCoordinate,
+                route.Routes[0].Duration
+            );
+
+            reststopModels = reststopModels
+                .Where(m => m.DetourDurationInSeconds <= maxDetourInSeconds)
+                .OrderBy(m => m.DistanceInMeters);
 
             return Ok(new ReststopsModel
             {
@@ -89,16 +92,48 @@ namespace Reststops.Presentation.API.Controllers
             });
         }
 
-        private static IEnumerable<ReststopModel> AddDistanceAndDurationValuesToModels(
-            DirectionsMatrix matrix,
-            IEnumerable<ReststopModel> models
+        private async Task<IEnumerable<ReststopModel>> AddDistanceAndDetourDurationToModels(
+            IEnumerable<ReststopModel> models,
+            Coordinate startCoordinate,
+            Coordinate endCoordinate,
+            double originalRouteDurationInSeconds
         )
-            => models.Select((ReststopModel m, int index) => m
-                .WithDistanceAndDuration(
-                    matrix.Distances[0][index],
-                    matrix.Durations[0][index]
-                )
-            );
+        {
+            var routedModels = new List<ReststopModel>();
+
+            foreach (ReststopModel model in models)
+            {
+                double distance = double.MaxValue;
+                double detourDuration = double.MaxValue;
+
+                // calculate route via this reststop to final destination
+                DirectionsRoute route = await _navigationService.GetDirections(
+                    new List<Coordinate>()
+                    {
+                        startCoordinate,
+                        new Coordinate(model.Longitude, model.Latitude),
+                        endCoordinate
+                    }
+                );
+
+                if (route != null && route.Routes.Count > 0)
+                {
+                    distance = route.Routes[0].Legs[0].Distance;
+                    detourDuration = Math.Abs(
+                        route.Routes[0].Duration - originalRouteDurationInSeconds
+                    );
+                }
+
+                routedModels.Add(
+                    model.WithDistanceAndDetourDuration(
+                        (int) Math.Round(distance),
+                        (int) Math.Round(detourDuration)
+                    )
+                );
+            }
+
+            return routedModels;
+        }
 
         private static Polygon GetBufferedPolygonFromDirectionsRouteGeometry(DirectionsRoute route)
             => new LineString(

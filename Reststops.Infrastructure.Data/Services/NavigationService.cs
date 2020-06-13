@@ -28,14 +28,16 @@ namespace Reststops.Infrastructure.Services
         #region Public Methods
 
         public async Task<DirectionsRoute> GetDirections(
-            Coordinate startCoordinate,
-            Coordinate endCoordinate
+            IEnumerable<Coordinate> coordinates
         )
         {
-            string coordinates = $"{ToMapboxString(startCoordinate)};{ToMapboxString(endCoordinate)}";
+            string coordinatesUrl = string.Join(
+                ';',
+                coordinates.Select(c => ToMapboxString(c))
+            );
 
             HttpResponseMessage response = await _httpClient.GetAsync(
-                $"https://api.mapbox.com/directions/v5/{PROFILE}/{coordinates}" + 
+                $"https://api.mapbox.com/directions/v5/{PROFILE}/{coordinatesUrl}" + 
                 $"?geometries=geojson&access_token={_mapboxAPIToken}"
             );
 
@@ -43,28 +45,6 @@ namespace Reststops.Infrastructure.Services
             {
                 string body = await response.Content.ReadAsStringAsync();
                 return JsonConvert.DeserializeObject<DirectionsRoute>(body);
-            }
-
-            return null;
-        }
-
-        public async Task<DirectionsMatrix> GetMatrix(Coordinate source, IEnumerable<Coordinate> destinations)
-        {
-            var coordinates = new List<Coordinate>() { source };
-            coordinates.AddRange(destinations);
-
-            string destinationIndices = string.Join(';', Enumerable.Range(1, destinations.Count()));
-
-            HttpResponseMessage response = await _httpClient.GetAsync(
-                $"https://api.mapbox.com/directions-matrix/v1/{PROFILE}/{ToMapboxString(coordinates)}?" +
-                $"sources=0&destinations={destinationIndices}&fallback_speed=80&" +
-                $"annotations=duration,distance&access_token={_mapboxAPIToken}"
-            );
-
-            if (response.IsSuccessStatusCode)
-            {
-                string body = await response.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<DirectionsMatrix>(body);
             }
 
             return null;

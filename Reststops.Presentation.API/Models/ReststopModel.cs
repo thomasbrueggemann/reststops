@@ -12,13 +12,16 @@ namespace Reststops.Presentation.API.Models
         public Dictionary<string, string> Tags { get; set; }
 
         // additional information for model
-        public double DistanceInMeters { get; set; }
-        public double DurationInSeconds { get; set; }
+        public int DistanceInMeters { get; set; }
+        public int DetourDurationInSeconds { get; set; }
 
-        public ReststopModel WithDistanceAndDuration(double distance, double duration)
+        public ReststopModel WithDistanceAndDetourDuration(
+            int distance,
+            int detourDuration
+        )
         {
             DistanceInMeters = distance;
-            DurationInSeconds = duration;
+            DetourDurationInSeconds = detourDuration;
 
             return this;
         }
