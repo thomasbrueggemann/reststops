@@ -1,14 +1,19 @@
 ﻿@using Reststops.Presentation.Web.DTO
+@using Reststops.Core
 
 @if (Reststops != null)
 {
     <ul class="timeline">
-        @foreach (ReststopResult reststop in Reststops)
+        @{
+            var i = 0;
+        }
+        @foreach (var reststop in Reststops)
         {
             <li>
                 <div class="direction-r">
                     <div class="flag-wrapper">
                         <span class="flag">
+                            <strong>@AlphaIndex.Get(i).ToUpper():</strong>
                             @if (string.IsNullOrWhiteSpace(reststop.Name))
                             {
                                 @if (reststop.HasTag("highway", "services"))
@@ -25,7 +30,9 @@
                                 @reststop.Name
                             }
                         </span>
-                        <span class="time-wrapper"><span class="time">@reststop.KilometersAway()</span></span>
+                        <span class="time-wrapper">
+                            <span class="time">@reststop.KilometersAway() / @reststop.DetourInMinutes()</span>
+                        </span>
                     </div>
                     <div class="desc">
                         @if (reststop.HasTag("toilets", "yes"))
@@ -69,8 +76,8 @@
                         }
 
                         @if (reststop.HasTag("fast_food", "yes") ||
-                            reststop.HasTag("restaurant", "yes") ||
-                            reststop.HasTag("amenity", "restaurant"))
+                          reststop.HasTag("restaurant", "yes") ||
+                          reststop.HasTag("amenity", "restaurant"))
                         {
                             <i class="fas fa-utensils fa-2x"></i>
                         }
@@ -128,6 +135,8 @@
                     </div>
                 </div>
             </li>
+
+            i++;
         }
     </ul>
 }

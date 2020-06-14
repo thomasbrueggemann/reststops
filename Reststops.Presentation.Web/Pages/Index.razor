@@ -7,61 +7,67 @@
 
 @inject HttpClient Http
 @inject LocationService LocationService
-@inject IJSRuntime jsRuntime
+@inject ILocalStorageService localStorage
+@inject NavigationManager NavigationManager
 
 <Bar Breakpoint="Breakpoint.Desktop" Background="Background.Light" ThemeContrast="ThemeContrast.Light">
     <BarBrand>
         🏞 Reststops
     </BarBrand>
 
-        <BarItem Float="Float.Right">
-            <BarLink @onclick="UpdateReststops">
-                <i class="fas fa-sync"></i>
-            </BarLink>
-        </BarItem>
+    <BarItem Float="Float.Right">
+        <BarLink @onclick="UpdateReststops">
+            <i class="fas fa-sync"></i>
+        </BarLink>
+    </BarItem>
 </Bar>
 
 <section class="section">
-    <Autocomplete Data="@autocompleteData"
-                  Size="Size.Medium"
-                  TextField="@((item) => item.Text)"
-                  ValueField="@((item) => item.Value)"
-                  SelectedValue="@selectedDestinationValue"
-                  SelectedValueChanged="@DestinationSelected"
-                  SearchChanged="@DestinationSearchChanged"
-                  Placeholder="Your destination?"
-                  Class="destinationTxt" />
+    @if (destination != null)
+    {
+        <Button Clicked="@OnDestinationClicked" Class="destinationChangeBtn" Block="true">
+            <strong>Destination:</strong> @destination?.Name
+        </Button>
+    }
 </section>
 
-<MiniMap StartLatitude="@startLatitude"
-         StartLongitude="@startLongitude"
-         EndLatitude="@endLatitude"
-         EndLongitude="@endLongitude"
-         RouteEncodedPolyline="@routeEncodedPolyline" />
+<div @onclick="OnMapClicked">
+    @if (currentMapType == MapType.Overview)
+    {
+        <OverviewMap StartLatitude="@startLatitude"
+            StartLongitude="@startLongitude"
+            EndLatitude="@destination?.Latitude"
+            EndLongitude="@destination?.Longitude"
+            RouteEncodedPolyline="@routeEncodedPolyline" />
+    }
+    else
+    {
+        <DetailMap StartLatitude="@startLatitude"
+            StartLongitude="@startLongitude"
+            Reststops="@reststops?.Reststops" />
+    }
+</div>
 
 <section class="section">
     <ResultsList Reststops="@reststops?.Reststops" />
 </section>
 
-
 @code{
-    public class DestinationSelectModel
+    private enum MapType
     {
-        public double[] Value { get; set; }
-        public string Text { get; set; }
+        Overview,
+        Detail
     }
 
     #region Private Members
 
-    private bool searchButtonDisabled = true;
-    private IEnumerable<DestinationSelectModel> autocompleteData;
     private double? startLatitude;
     private double? startLongitude;
-    private double? endLatitude;
-    private double? endLongitude;
     private string routeEncodedPolyline;
     private ReststopsResult reststops;
-    private double[] selectedDestinationValue;
+    private double[] selectedDestinationValue = new double[] { 0, 0 };
+    private DestinationResult destination;
+    private MapType currentMapType = MapType.Overview;
 
     #endregion
 
@@ -69,14 +75,32 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await UpdateLocation();
+        destination = await localStorage.GetItemAsync<DestinationResult>(
+            "destination"
+        );
 
-        CheckSearchButtonDisabled();
+        Console.WriteLine(destination.Name);
+
+        // check if destination is set, otherwise make user select one
+        if (destination == null)
+        {
+            NavigationManager.NavigateTo("destination");
+        }
+
+        await UpdateReststops();
     }
 
     #endregion
 
     #region Private Methods
+
+    private void OnMapClicked()
+        => currentMapType = (currentMapType == MapType.Overview) ? MapType.Detail : MapType.Overview;
+
+    private void OnDestinationClicked()
+    {
+        NavigationManager.NavigateTo("destination");
+    }
 
     private async Task UpdateLocation()
     {
@@ -86,50 +110,13 @@
         startLongitude = (double?)location.Longitude;
     }
 
-    private async Task DestinationSearchChanged(string text)
-    {
-        if (!string.IsNullOrWhiteSpace(text))
-        {
-            var result = await Http.GetFromJsonAsync<IEnumerable<PlacesResult>>(
-                $"{Constants.API_BASEURL}/places?text={text}"
-            );
-
-            autocompleteData = result.Select(f => new DestinationSelectModel
-            {
-                Text = f.Name,
-                Value = new double[2] { f.Longitude, f.Latitude }
-            });
-        }
-    }
-
-    private void CheckSearchButtonDisabled()
-    {
-        searchButtonDisabled = !startLongitude.HasValue ||
-                                !startLatitude.HasValue ||
-                                selectedDestinationValue == null;
-    }
-
-    private async Task DestinationSelected(object value)
-    {
-        selectedDestinationValue = value as double[];
-
-        endLongitude = selectedDestinationValue[0];
-        endLatitude = selectedDestinationValue[1];
-
-        await UpdateReststops();
-
-        CheckSearchButtonDisabled();
-    }
-
     private async Task UpdateReststops()
     {
-        Console.WriteLine("UpdateReststops");
-
         await UpdateLocation();
 
         reststops = await Http.GetFromJsonAsync<ReststopsResult>(
             $"{Constants.API_BASEURL}/reststops?startLat={startLatitude}&startLon={startLongitude}&" +
-            $"endLat={endLatitude}&endLon={endLongitude}"
+            $"endLat={destination.Latitude}&endLon={destination.Longitude}"
         );
 
         routeEncodedPolyline = EncodedPolyline.Simplify(reststops.Route);

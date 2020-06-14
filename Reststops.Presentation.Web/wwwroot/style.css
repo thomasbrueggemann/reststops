@@ -26,3 +26,9 @@ section {
     width: 100% !important;
     overflow: hidden;
 }
+
+.destinationChangeBtn {
+    justify-content: left !important;
+    text-align: left !important;
+    overflow: hidden !important;
+}

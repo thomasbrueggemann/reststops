@@ -1,5 +1,7 @@
 ﻿@using Reststops.Presentation.Web.Services;
 @using Reststops.Core;
+@using Reststops.Core.Entities
+@using Reststops.Presentation.Web.DTO
 
 @inject BrowserService browserService
 
@@ -11,21 +13,16 @@
 @code {
     [Parameter] public double? StartLatitude { get; set; }
     [Parameter] public double? StartLongitude { get; set; }
-    [Parameter] public double? EndLatitude { get; set; }
-    [Parameter] public double? EndLongitude { get; set; }
-    [Parameter] public string RouteEncodedPolyline { get; set; }
+    [Parameter] public IEnumerable<ReststopResult> Reststops { get; set; }
 
-    private readonly string MAPBOX_TOKEN = Environment.GetEnvironmentVariable("MAPBOX_TOKEN");
     private string staticMapUrl { get; set; }
 
     private async Task UpdateStaticMap()
     {
-        Console.WriteLine("UpdateStaticMap", StartLatitude, StartLongitude);
-
         var dimension = await browserService.GetDimensions();
         int width = Math.Min(dimension.Width, 1280);
 
-        var staticMap = new MapboxStaticMap(MAPBOX_TOKEN)
+        var staticMap = new MapboxStaticMap(Constants.MAPBOX_TOKEN)
             .SetStyle("streets-v11")
             .SetDimensions(width, 300);
 
@@ -41,29 +38,23 @@
             });
         }
 
-        if (EndLatitude.HasValue && EndLongitude.HasValue)
+        if (Reststops != null)
         {
-            staticMap.AddMarker(new MapboxStaticMap.Marker()
-            {
-                ColorCode = "FF0000",
-                Label = "2",
-                Type = MapboxStaticMap.MarkerType.PIN_L,
-                Latitude = EndLatitude.Value,
-                Longitude = EndLongitude.Value
-            });
-        }
+            int reststopIdx = 0;
 
-        if (!string.IsNullOrWhiteSpace(RouteEncodedPolyline))
-        {
-            Console.WriteLine("addpath");
-
-            staticMap.AddPath(new MapboxStaticMap.Path()
+            foreach (ReststopResult reststop in Reststops)
             {
-                Polyline = RouteEncodedPolyline,
-                StrokeColor = "FF0000",
-                StrokeWidth = 3,
-                StrokeOpacity = 0.8
-            });
+                staticMap.AddMarker(new MapboxStaticMap.Marker()
+                {
+                    ColorCode = "036bfc",
+                    Label = AlphaIndex.Get(reststopIdx),
+                    Type = MapboxStaticMap.MarkerType.PIN_S,
+                    Latitude = reststop.Latitude,
+                    Longitude = reststop.Longitude
+                });
+
+                reststopIdx++;
+            }
         }
 
         staticMapUrl = staticMap.ToString();

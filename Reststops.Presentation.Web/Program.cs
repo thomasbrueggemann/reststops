@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using AspNetMonsters.Blazor.Geolocation;
 using Reststops.Presentation.Web.Services;
+using Blazored.LocalStorage;
 
 namespace Reststops.Presentation.Web
 {
@@ -17,7 +18,7 @@ namespace Reststops.Presentation.Web
         {
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("app");
-           
+
             builder.Services
                 .AddScoped<LocationService>()
                 .AddScoped<BrowserService>()
@@ -27,8 +28,9 @@ namespace Reststops.Presentation.Web
                     options.ChangeTextOnKeyPress = true;
                 })
                 .AddBulmaProviders()
-                .AddFontAwesomeIcons();
-
+                .AddFontAwesomeIcons()
+                .AddBlazoredLocalStorage();
+                
             var host = builder.Build();
 
             host.Services

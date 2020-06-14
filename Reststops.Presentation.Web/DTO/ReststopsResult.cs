@@ -11,8 +11,8 @@ namespace Reststops.Presentation.Web.DTO
         public double Longitude { get; set; }
         public string Type { get; set; }
         public Dictionary<string, string> Tags { get; set; }
-        public double DistanceInMeters { get; set; }
-        public double DurationInSeconds { get; set; }
+        public int DistanceInMeters { get; set; }
+        public int DetourDurationInSeconds { get; set; }
 
         public bool HasTag(string key, string value)
             => Tags.ContainsKey(key) && Tags[key] == value;
@@ -20,7 +20,9 @@ namespace Reststops.Presentation.Web.DTO
         public bool HasTag(string key)
             => Tags.ContainsKey(key);
 
-        public string KilometersAway() => $"{Math.Round(DistanceInMeters / 1000.0, 1)} km";
+        public string KilometersAway() => $"{Math.Round((double) DistanceInMeters / 1000.0, 1)} km";
+
+        public string DetourInMinutes() => $"+{(int)(DetourDurationInSeconds / 60)} min";
     }
 
     public class ReststopsResult
