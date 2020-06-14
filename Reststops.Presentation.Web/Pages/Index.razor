@@ -17,7 +17,14 @@
 
     <BarItem Float="Float.Right">
         <BarLink @onclick="UpdateReststops">
-            <i class="fas fa-sync"></i>
+            @if (reststopsAreLoading == true)
+            {
+                <i class="fas fa-sync fa-spin"></i>
+            }
+            else
+            {
+                <i class="fas fa-sync"></i>
+            }
         </BarLink>
     </BarItem>
 </Bar>
@@ -68,6 +75,7 @@
     private double[] selectedDestinationValue = new double[] { 0, 0 };
     private DestinationResult destination;
     private MapType currentMapType = MapType.Overview;
+    private bool reststopsAreLoading = false;
 
     #endregion
 
@@ -112,6 +120,8 @@
 
     private async Task UpdateReststops()
     {
+        reststopsAreLoading = true;
+
         await UpdateLocation();
 
         reststops = await Http.GetFromJsonAsync<ReststopsResult>(
@@ -120,6 +130,7 @@
         );
 
         routeEncodedPolyline = EncodedPolyline.Simplify(reststops.Route);
+        reststopsAreLoading = false;
     }
 
     #endregion
