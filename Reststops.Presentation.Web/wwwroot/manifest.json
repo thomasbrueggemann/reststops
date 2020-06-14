@@ -1,7 +1,7 @@
 {
   "name": "Reststops",
   "short_name": "Reststops",
-  "start_url": "./",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#f5f5f5",
