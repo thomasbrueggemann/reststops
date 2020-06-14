@@ -15,6 +15,7 @@
     [Parameter] public double? EndLongitude { get; set; }
     [Parameter] public string RouteEncodedPolyline { get; set; }
 
+    private readonly string MAPBOX_TOKEN = Environment.GetEnvironmentVariable("MAPBOX_TOKEN");
     private string staticMapUrl { get; set; }
 
     private async Task UpdateStaticMap()
@@ -24,7 +25,7 @@
         var dimension = await browserService.GetDimensions();
         int width = Math.Min(dimension.Width, 1280);
 
-        var staticMap = new MapboxStaticMap(Constants.MAPBOX_TOKEN)
+        var staticMap = new MapboxStaticMap(MAPBOX_TOKEN)
             .SetStyle("streets-v11")
             .SetDimensions(width, 300);
 
