@@ -10,6 +10,7 @@ using Reststops.Core.Interfaces.Repositories;
 using Reststops.Core.Interfaces.Services;
 using Reststops.Core.Entities;
 using Reststops.Presentation.API.Models;
+using Geometry = Reststops.Core.Entities.Geometry;
 
 namespace Reststops.Presentation.API.Controllers
 {
@@ -68,6 +69,8 @@ namespace Reststops.Presentation.API.Controllers
                     bufferedPolygon
                 );
 
+            var boundingBox = GetReststopsBoundingBox(reststops);
+
             // map entities to api models
             var reststopModels = _mapper.Map<IEnumerable<ReststopModel>>(
                 reststops
@@ -88,7 +91,12 @@ namespace Reststops.Presentation.API.Controllers
             {
                 Reststops = reststopModels,
                 Route = EncodedPolyline.Encode(route.Routes[0].Geometry.ToCoordinates()),
-                Corridor = EncodedPolyline.Encode(bufferedPolygon.Coordinates)
+                ReststopsRoute = EncodedPolyline.Encode(
+                    (await GetDetailedRouteGeometry(
+                        new Polyline(route.Routes[0].Geometry.ToCoordinates())
+                            .FitEnvelope(boundingBox)
+                    )).ToCoordinates()
+                )
             });
         }
 
@@ -143,5 +151,29 @@ namespace Reststops.Presentation.API.Controllers
                 )
                 .Buffer(0.02)
                 .Reverse() as Polygon;
+
+        private static Envelope GetReststopsBoundingBox(IEnumerable<Reststop> reststops)
+        {
+            var envelope = new Envelope();
+
+            foreach(var reststop in reststops)
+            {
+                envelope.ExpandToInclude(new Coordinate(
+                    reststop.Longitude,
+                    reststop.Latitude
+                ));
+            }
+
+            return envelope;
+        }
+
+        private async Task<Geometry> GetDetailedRouteGeometry(Polyline detailedPolyline)
+        {
+            var detailedRoute = await _navigationService.GetDirections(
+                detailedPolyline.GetCoordinates()
+            );
+
+            return detailedRoute.Routes[0].Geometry;
+        }
     }
 }

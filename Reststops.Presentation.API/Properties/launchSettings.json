@@ -22,7 +22,10 @@
       "launchUrl": "reststops?startLat=50&startLon=7&endLat=51&endLon=7",
       "applicationUrl": "http://localhost:3736",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "COSMOSDB_ACCOUNT_ENDPOINT": "https://reststops.documents.azure.com:443/",
+        "MAPBOX_TOKEN": "sk.eyJ1IjoiYmx1ZWdnZW1hbm4iLCJhIjoiY2tiZXVobWw1MDMxMTJzbWw0MThyNXRvcSJ9.x4_Wz814cr1XHgLy61DBbg",
+        "COSMOSDB_ACCOUNT_KEY": "zFidnSJPu1bMwGYiDfml32kP9koFWDhoKfZXLsrXkYlvCXrFyYA3txmANaWySQ2HQyYryp7uviygVFwuiSPCzA=="
       }
     }
   }

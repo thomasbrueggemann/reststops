@@ -70,31 +70,24 @@ namespace Reststops.Services.Import
 
                     if (!lat.HasValue || !lon.HasValue) continue;
 
-                    var tags = ((JObject) element.tags).ToObject<Dictionary<string, string>>();
+                    var tags = ((JObject)element.tags).ToObject<Dictionary<string, string>>();
 
                     var reststop = new Reststop
-                    (
-                        ID: (ulong) element.id,
-                        Name: tags.GetValueOrDefault("name", null),
-                        Latitude: lat.Value,
-                        Longitude: lon.Value,
-                        Type: tags.GetValueOrDefault("highway", "rest_area") == "services"
+                    {
+                        ID = (ulong)element.id,
+                        Name = tags.GetValueOrDefault("name", null),
+                        Latitude = lat.Value,
+                        Longitude = lon.Value,
+                        Type = tags.GetValueOrDefault("highway", "rest_area") == "services"
                                 ? ReststopType.ServiceArea
                                 : ReststopType.RestArea,
-                        Tags: tags
-                    );
+                        Tags = tags
+                    };
 
                     Console.WriteLine(reststop.ID);    
 
                     await reststopRepository.Insert(reststop);
                     insertCount++;
-
-                    // every 350 items, wait a second to not exceed
-                    // 400 requests / second on the database
-                    if (insertCount % 350 == 0)
-                    {
-                        await Task.Delay(1000);
-                    }
                 }
                 catch(Exception e)
                 {

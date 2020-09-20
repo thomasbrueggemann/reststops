@@ -33,5 +33,8 @@ namespace Reststops.Core.Entities
                 simplifiedList.Select(s => new Coordinate(s.X, s.Y))
             );
         }
+
+        public Polyline FitEnvelope(Envelope envelope)
+            => new Polyline(_coordinates.Where(c => envelope.Contains(c)));
     }
 }

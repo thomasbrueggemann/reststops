@@ -23,6 +23,8 @@ namespace Reststops.Presentation.Web.DTO
         public string KilometersAway() => $"{Math.Round((double) DistanceInMeters / 1000.0, 1)} km";
 
         public string DetourInMinutes() => $"+{(int)(DetourDurationInSeconds / 60)} min";
+
+        public int ListIndex { get; set; }
     }
 
     public class ReststopsResult

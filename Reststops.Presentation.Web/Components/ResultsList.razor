@@ -1,40 +1,38 @@
 ﻿@using Reststops.Presentation.Web.DTO
 @using Reststops.Core
+@using System.Linq; 
 
 @if (Reststops != null)
 {
-    <ul class="timeline">
-        @{
-            var i = 0;
-        }
-        @foreach (var reststop in Reststops)
-        {
-            <li>
-                <div class="direction-r">
-                    <div class="flag-wrapper">
-                        <span class="flag">
-                            <strong>@AlphaIndex.Get(i).ToUpper():</strong>
-                            @if (string.IsNullOrWhiteSpace(reststop.Name))
+
+    <Table>
+        <TableBody>
+            @foreach (var reststop in Reststops)
+            {
+                <TableRow>
+                    <TableRowHeader>@AlphaIndex.Get(reststop.ListIndex).ToUpper()</TableRowHeader>
+                    <TableRowCell>
+                        @if (string.IsNullOrWhiteSpace(reststop.Name))
+                        {
+                            @if (reststop.HasTag("highway", "services"))
                             {
-                                @if (reststop.HasTag("highway", "services"))
-                                {
-                                    <span>Raststätte</span>
-                                }
-                                else
-                                {
-                                    <span>Rastplatz</span>
-                                }
+                                <span>Raststätte</span>
                             }
                             else
                             {
-                                @reststop.Name
+                                <span>Rastplatz</span>
                             }
-                        </span>
-                        <span class="time-wrapper">
-                            <span class="time">@reststop.KilometersAway() / @reststop.DetourInMinutes()</span>
-                        </span>
-                    </div>
-                    <div class="desc">
+                        }
+                        else
+                        {
+                            @reststop.Name
+                        }
+                    </TableRowCell>
+                    <TableRowCell>
+                        @reststop.KilometersAway() <br />
+                        @reststop.DetourInMinutes()
+                    </TableRowCell>
+                    <TableRowCell>
                         @if (reststop.HasTag("toilets", "yes"))
                         {
                             <i class="fas fa-restroom fa-2x"></i>
@@ -76,8 +74,8 @@
                         }
 
                         @if (reststop.HasTag("fast_food", "yes") ||
-                          reststop.HasTag("restaurant", "yes") ||
-                          reststop.HasTag("amenity", "restaurant"))
+                        reststop.HasTag("restaurant", "yes") ||
+                        reststop.HasTag("amenity", "restaurant"))
                         {
                             <i class="fas fa-utensils fa-2x"></i>
                         }
@@ -132,15 +130,20 @@
                         {
                             <i class="fas fa-clock"></i> @reststop.Tags["opening_hours"]
                         }
-                    </div>
-                </div>
-            </li>
+                    </TableRowCell>
+                </TableRow>
+            }
 
-            i++;
-        }
-    </ul>
+        </TableBody>
+    </Table>
 }
 
 @code {
     [Parameter] public IEnumerable<ReststopResult> Reststops { get; set; }
+
+    protected override void OnParametersSet()
+         => Reststops = Reststops?.Select((reststop, index) => {
+             reststop.ListIndex = index;
+             return reststop;
+         });
 }

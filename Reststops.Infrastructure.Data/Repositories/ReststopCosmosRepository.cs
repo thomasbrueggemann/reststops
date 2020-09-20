@@ -14,7 +14,7 @@ using NetTopologySuite.Geometries;
 
 namespace Reststops.Infrastructure.Repositories
 {
-    public class ReststopRepository : CosmosDocumentRepository, IReststopRepository
+    public class ReststopCosmosRepository : CosmosDocumentRepository, IReststopRepository
     {
         private readonly IMapper _mapper;
 
@@ -23,7 +23,7 @@ namespace Reststops.Infrastructure.Repositories
         private const string PARTITION_KEY = "/id";
         private const string SPATIAL_KEY = "/location/*";
 
-        public ReststopRepository(
+        public ReststopCosmosRepository(
             IDocumentClient cosmosClient,
             IMapper mapper
         ) : base(cosmosClient, DB_NAME, COL_NAME, PARTITION_KEY, SPATIAL_KEY)
