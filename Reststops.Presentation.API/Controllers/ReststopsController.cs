@@ -133,10 +133,11 @@ namespace Reststops.Presentation.API.Controllers
                 }
 
                 routedModels.Add(
-                    model.WithDistanceAndDetourDuration(
-                        (int) Math.Round(distance),
-                        (int) Math.Round(detourDuration)
-                    )
+                    model with
+                    {
+                        DistanceInMeters = (int)Math.Round(distance),
+                        DetourDurationInSeconds = (int)Math.Round(detourDuration)
+                    }
                 );
             }
 

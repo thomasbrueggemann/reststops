@@ -1,9 +1,9 @@
 ﻿namespace Reststops.Presentation.API.Models
 {
-    public class PlaceModel
+    public record PlaceModel
     {
-        public string Name { get; set; }
-        public double Latitude { get; set; }
-        public double Longitude { get; set; }
+        public string Name { get; init; }
+        public double Latitude { get; init; }
+        public double Longitude { get; init; }
     }
 }

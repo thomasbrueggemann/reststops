@@ -5,7 +5,7 @@ using Reststops.Core.Enums;
 
 namespace Reststops.Presentation.API.Models
 {
-    public class EntityModelMappingProfile : Profile
+    public sealed class EntityModelMappingProfile : Profile
     {
         public EntityModelMappingProfile()
         {

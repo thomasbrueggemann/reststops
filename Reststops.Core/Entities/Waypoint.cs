@@ -2,10 +2,10 @@
 
 namespace Reststops.Core.Entities
 {
-    public class Waypoint
+    public record Waypoint
     {
-        public double Distance { get; set; }
-        public string Name { get; set; }
-        public List<double> Location { get; set; }
+        public double Distance { get; init; }
+        public string Name { get; init; }
+        public List<double> Location { get; init; }
     }
 }

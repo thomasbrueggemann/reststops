@@ -2,28 +2,22 @@
 
 namespace Reststops.Presentation.API.Models
 {
-    public class ReststopModel
+    public record ReststopModel
     {
-        public ulong ID { get; set; }
-        public string Name { get; set; }
-        public double Latitude { get; set; }
-        public double Longitude { get; set; }
-        public string Type { get; set; }
-        public Dictionary<string, string> Tags { get; set; }
+        public ulong ID { get; init; }
 
-        // additional information for model
-        public int DistanceInMeters { get; set; }
-        public int DetourDurationInSeconds { get; set; }
+        public string Name { get; init; }
 
-        public ReststopModel WithDistanceAndDetourDuration(
-            int distance,
-            int detourDuration
-        )
-        {
-            DistanceInMeters = distance;
-            DetourDurationInSeconds = detourDuration;
+        public double Latitude { get; init; }
 
-            return this;
-        }
+        public double Longitude { get; init; }
+
+        public string Type { get; init; }
+
+        public Dictionary<string, string> Tags { get; init; }
+
+        public int DistanceInMeters { get; init; }
+
+        public int DetourDurationInSeconds { get; init; }
     }
 }

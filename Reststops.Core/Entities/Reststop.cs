@@ -3,13 +3,13 @@ using Reststops.Core.Enums;
 
 namespace Reststops.Core.Entities
 {
-    public class Reststop
+    public record Reststop
     {
-        public ulong ID { get; set; }
-        public string Name { get; set; }
-        public double Latitude { get; set; }
-        public double Longitude { get; set; }
-        public ReststopType Type { get; set; }
-        public Dictionary<string, string> Tags { get; set; }
+        public ulong ID { get; init; }
+        public string Name { get; init; }
+        public double Latitude { get; init; }
+        public double Longitude { get; init; }
+        public ReststopType Type { get; init; }
+        public Dictionary<string, string> Tags { get; init; }
     }
 }

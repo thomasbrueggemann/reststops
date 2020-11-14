@@ -4,10 +4,10 @@ using NetTopologySuite.Geometries;
 
 namespace Reststops.Core.Entities
 {
-    public class Geometry
+    public record Geometry
     {
-        public double[][] Coordinates { get; set; }
-        public string Type { get; set; }
+        public double[][] Coordinates { get; init; }
+        public string Type { get; init; }
 
         public IEnumerable<Coordinate> ToCoordinates()
             => Coordinates.Select(c => new Coordinate(c[0], c[1]));

@@ -1,9 +1,9 @@
 ﻿namespace Reststops.Core.Entities
 {
-    public class DirectionsMatrix
+    public record DirectionsMatrix
     {
-        public string Code { get; set; }
-        public double[][] Distances { get; set; }
-        public double[][] Durations { get; set; }
+        public string Code { get; init; }
+        public double[][] Distances { get; init; }
+        public double[][] Durations { get; init; }
     }
 }

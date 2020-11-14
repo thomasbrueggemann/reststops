@@ -14,17 +14,16 @@ namespace Reststops.Presentation.API.Controllers
     [Route("[controller]")]
     public class PlacesController : ControllerBase
     {
-        private readonly ILogger<PlacesController> _logger;
+        private const string InvalidTextParameterError = "Invalid 'text' parameter specified";
+
         private readonly IMapper _mapper;
         private readonly IGeocodingService _geocodingService;
 
         public PlacesController(
-            ILogger<PlacesController> logger,
             IMapper mapper,
             IGeocodingService geocodingService
         )
         {
-            _logger = logger;
             _mapper = mapper;
 
             _geocodingService = geocodingService
@@ -36,6 +35,11 @@ namespace Reststops.Presentation.API.Controllers
             [FromQuery] string text
         )
         {
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return BadRequest(InvalidTextParameterError);
+            }
+
             ForwardGeocoding geocodingResult = await _geocodingService.GetForwardGeocoding(text);
 
             return Ok(

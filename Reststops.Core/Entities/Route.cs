@@ -2,13 +2,13 @@
 
 namespace Reststops.Core.Entities
 {
-    public class Route
+    public record Route
     {
-        public Geometry Geometry { get; set; }
-        public List<Leg> Legs { get; set; }
-        public string WeightName { get; set; }
-        public double Weight { get; set; }
-        public double Duration { get; set; }
-        public double Distance { get; set; }
+        public Geometry Geometry { get; init; }
+        public List<Leg> Legs { get; init; }
+        public string WeightName { get; init; }
+        public double Weight { get; init; }
+        public double Duration { get; init; }
+        public double Distance { get; init; }
     }
 }

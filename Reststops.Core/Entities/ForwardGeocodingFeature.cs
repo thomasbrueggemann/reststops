@@ -2,25 +2,25 @@
 
 namespace Reststops.Core.Entities
 {
-    public class ForwardGeocodingFeature
+    public record ForwardGeocodingFeature
     {
-        public string Id { get; set; }
-        public string Type { get; set; }
+        public string Id { get; init; }
+        public string Type { get; init; }
 
         [JsonProperty("place_type")]
-        public string[] PlaceType { get; set; }
-        public long Relevance { get; set; }
-        public string Text { get; set; }
+        public string[] PlaceType { get; init; }
+        public long Relevance { get; init; }
+        public string Text { get; init; }
 
         [JsonProperty("place_name")]
-        public string PlaceName { get; set; }
-        public double[] Bbox { get; set; }
-        public double[] Center { get; set; }
+        public string PlaceName { get; init; }
+        public double[] Bbox { get; init; }
+        public double[] Center { get; init; }
 
         [JsonProperty("matching_text")]
-        public string MatchingText { get; set; }
+        public string MatchingText { get; init; }
 
         [JsonProperty("matching_place_name")]
-        public string MatchingPlaceName { get; set; }
+        public string MatchingPlaceName { get; init; }
     }
 }

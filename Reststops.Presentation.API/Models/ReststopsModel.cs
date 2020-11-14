@@ -2,10 +2,10 @@
 
 namespace Reststops.Presentation.API.Models
 {
-    public class ReststopsModel
+    public record ReststopsModel
     {
-        public IEnumerable<ReststopModel> Reststops { get; set; }
-        public string Route { get; set; }
-        public string ReststopsRoute { get; set; }
+        public IEnumerable<ReststopModel> Reststops { get; init; }
+        public string Route { get; init; }
+        public string ReststopsRoute { get; init; }
     }
 }

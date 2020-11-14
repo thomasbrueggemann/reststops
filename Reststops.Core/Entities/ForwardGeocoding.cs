@@ -1,10 +1,10 @@
 ﻿namespace Reststops.Core.Entities
 {
-    public class ForwardGeocoding
+    public record ForwardGeocoding
     {
-        public string Type { get; set; }
-        public string[] Query { get; set; }
-        public ForwardGeocodingFeature[] Features { get; set; }
-        public string Attribution { get; set; }
+        public string Type { get; init; }
+        public string[] Query { get; init; }
+        public ForwardGeocodingFeature[] Features { get; init; }
+        public string Attribution { get; init; }
     }
 }

@@ -2,11 +2,11 @@
 
 namespace Reststops.Core.Entities
 {
-    public class DirectionsRoute
+    public record DirectionsRoute
     {
-        public List<Route> Routes { get; set; }
-        public List<Waypoint> Waypoints { get; set; }
-        public string Code { get; set; }
-        public string Uuid { get; set; }
+        public List<Route> Routes { get; init; }
+        public List<Waypoint> Waypoints { get; init; }
+        public string Code { get; init; }
+        public string Uuid { get; init; }
     }
 }
