@@ -1,17 +1,18 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reststops.Presentation.API", "Reststops.Presentation.API\Reststops.Presentation.API.csproj", "{344DFE6F-DCA4-4C07-BACD-2D93D213A506}"
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30711.63
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reststops.Presentation.API", "Reststops.Presentation.API\Reststops.Presentation.API.csproj", "{344DFE6F-DCA4-4C07-BACD-2D93D213A506}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reststops.Presentation.Web", "Reststops.Presentation.Web\Reststops.Presentation.Web.csproj", "{C839F5F6-39B9-4D1B-A5AC-D1ACE28E19F1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reststops.Presentation.Web", "Reststops.Presentation.Web\Reststops.Presentation.Web.csproj", "{C839F5F6-39B9-4D1B-A5AC-D1ACE28E19F1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reststops.Services.Import", "Reststops.Services.Import\Reststops.Services.Import.csproj", "{D58AA92E-30BE-49E6-96A4-EC7B89B39B1B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reststops.Services.Import", "Reststops.Services.Import\Reststops.Services.Import.csproj", "{D58AA92E-30BE-49E6-96A4-EC7B89B39B1B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reststops.Infrastructure", "Reststops.Infrastructure.Data\Reststops.Infrastructure.csproj", "{A195C989-9EB4-4035-BDF4-99688C8D633A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reststops.Infrastructure", "Reststops.Infrastructure.Data\Reststops.Infrastructure.csproj", "{A195C989-9EB4-4035-BDF4-99688C8D633A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reststops.Core", "Reststops.Core\Reststops.Core.csproj", "{C22DE9AE-B029-453B-8827-6136A48113A7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reststops.Core", "Reststops.Core\Reststops.Core.csproj", "{C22DE9AE-B029-453B-8827-6136A48113A7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reststops.Core.Test", "Reststops.Core.Test\Reststops.Core.Test.csproj", "{8BE6B134-20A8-49E1-8385-93E8A1F79D97}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reststops.Core.Test", "Reststops.Core.Test\Reststops.Core.Test.csproj", "{8BE6B134-20A8-49E1-8385-93E8A1F79D97}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,5 +44,11 @@ Global
 		{8BE6B134-20A8-49E1-8385-93E8A1F79D97}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8BE6B134-20A8-49E1-8385-93E8A1F79D97}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8BE6B134-20A8-49E1-8385-93E8A1F79D97}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {881D6CAB-22AC-488D-88F4-6B91C3B7ED52}
 	EndGlobalSection
 EndGlobal

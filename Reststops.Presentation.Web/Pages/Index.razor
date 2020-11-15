@@ -122,12 +122,15 @@
 
         await UpdateLocation();
 
-        reststops = await Http.GetFromJsonAsync<ReststopsResult>(
-            $"{Constants.API_BASEURL}/reststops?startLat={startLatitude}&startLon={startLongitude}&" +
-            $"endLat={destination.Latitude}&endLon={destination.Longitude}"
-        );
+        if (destination != null)
+        {
+            reststops = await Http.GetFromJsonAsync<ReststopsResult>(
+                $"{Constants.API_BASEURL}/reststops?startLat={startLatitude}&startLon={startLongitude}&" +
+                $"endLat={destination.Latitude}&endLon={destination.Longitude}"
+            );
 
-        routeEncodedPolyline = EncodedPolyline.Simplify(reststops.Route);
+            routeEncodedPolyline = EncodedPolyline.Simplify(reststops.Route);
+        }
         reststopsAreLoading = false;
     }
 
