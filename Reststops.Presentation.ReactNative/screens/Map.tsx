@@ -1,21 +1,22 @@
-import React, { useContext, useEffect, useState } from "react";
-import { StyleSheet, View, Text, ScrollView, ActivityIndicator } from "react-native";
+import React, { useContext, useEffect, useLayoutEffect, useState } from "react";
+import { StyleSheet, View, Text, ScrollView, ActivityIndicator, Button } from "react-native";
 import DestinationContext from "../contexts/DestinationContext";
 import { BASE_URL } from "../constants";
 import { Reststop } from "../models/Reststop";
 import ReststopsMap from "../components/ReststopsMap";
 import Geolocation, { GeolocationResponse } from "@react-native-community/geolocation";
 import ResultList from "../components/ResultList";
+import { useNavigation } from "@react-navigation/native";
 
 const Map = () => {
 	const [isLoading, setLoading] = useState(false);
 	const [reststops, setReststops] = useState<Reststop[]>([]);
 	const [route, setRoute] = useState<string>();
 	const [userLocation, setUserLocation] = useState<GeolocationResponse>();
-
 	const destinationContext = useContext(DestinationContext.Context);
+	const navigation = useNavigation();
 
-	useEffect(() => {
+	const getLocation = () => {
 		Geolocation.getCurrentPosition(
 			(info) => setUserLocation(info),
 			() => {},
@@ -24,7 +25,15 @@ const Map = () => {
 				maximumAge: 0
 			}
 		);
-	}, []);
+	};
+
+	useLayoutEffect(() => {
+		navigation.setOptions({
+			headerRight: () => <Button onPress={getLocation} title="Refresh" />
+		});
+	}, [navigation]);
+
+	useEffect(getLocation, []);
 
 	useEffect(() => {
 		const start = userLocation?.coords;
@@ -63,8 +72,7 @@ const styles = StyleSheet.create({
 		flex: 1
 	},
 	results: {
-		flex: 2,
-		padding: 20
+		flex: 2
 	}
 });
 

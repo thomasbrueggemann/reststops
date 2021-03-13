@@ -20,7 +20,7 @@ const Destination = ({ navigation }: { navigation: StackNavigationProp<any, "Des
 	const destinationContext = useContext(DestinationContext.Context);
 
 	useEffect(() => {
-		if (!typedDestination) return;
+		if (!typedDestination || typedDestination.length <= 2) return;
 
 		setLoading(true);
 
@@ -74,14 +74,18 @@ const Destination = ({ navigation }: { navigation: StackNavigationProp<any, "Des
 
 const styles = StyleSheet.create({
 	item: {
-		backgroundColor: "#f9c2ff",
+		backgroundColor: "#ddd",
+		borderRadius: 10,
 		padding: 10,
 		marginVertical: 8
 	},
 	placeInput: {
 		height: 40,
 		borderColor: "gray",
-		borderWidth: 1
+		borderWidth: 1,
+		backgroundColor: "white",
+		paddingLeft: 10,
+		marginBottom: 10
 	}
 });
 

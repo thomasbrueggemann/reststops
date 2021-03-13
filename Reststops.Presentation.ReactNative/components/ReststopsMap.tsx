@@ -31,7 +31,7 @@ const ReststopsMap = (props: MapViewProps) => {
 				coordinates={rawRouteCoordinates.map((c) => {
 					return { latitude: c[0], longitude: c[1] };
 				})}
-				strokeColor="#FF0000"
+				strokeColor="rgb(45,156,219)"
 				strokeWidth={4}
 			/>
 
