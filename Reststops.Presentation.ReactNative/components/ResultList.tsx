@@ -1,13 +1,10 @@
 import React from "react";
 import { Reststop } from "../models/Reststop";
 import Timeline, { Data } from "react-native-timeline-flatlist";
-import ReststopsMap from "./ReststopsMap";
 
 export interface ResultListProps {
 	reststops: Reststop[];
 }
-
-const yesNo = (input: boolean) => (input ? "yes" : "no");
 
 const getDescription = (reststop: Reststop): string => {
 	const amenetyOptions = [
