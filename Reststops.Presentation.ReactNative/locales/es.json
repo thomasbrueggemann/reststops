@@ -1,0 +1,27 @@
+{
+	"whatsYourDestination": "¿Cuál es su destino?",
+	"destination": "Destino",
+	"reststops": "Paradas de descanso",
+	"refresh": "Actualizar",
+	"reststop": "Área de descanso",
+	"amenities": {
+		"restArea": "Área de descanso",
+		"servicesArea": "Área de descanso, Gasolinera",
+		"toilets": "Aseos",
+		"noToilets": "No hay aseos",
+		"babyChange": "Vestuario para bebés",
+		"parking": "Aparcamiento",
+		"hotel": "Hotel",
+		"caravan": "Aparcamiento para caravanas",
+		"charginStation": "Estación de carga",
+		"restaurant": "Restaurante",
+		"shower": "Ducha",
+		"wheelchairAccess": "Acceso para sillas de ruedas",
+		"noWheelchairAccess": "No hay acceso para sillas de ruedas",
+		"wasteBasket": "Papelera",
+		"shop": "Tienda",
+		"touristInformation": "Información turística",
+		"drinkingWater": "Agua potable",
+		"noDrinkingWater": "No hay agua potable"
+	}
+}
