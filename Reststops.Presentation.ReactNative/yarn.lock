@@ -3127,7 +3127,7 @@
   "resolved" "https://registry.npmjs.org/human-signals/-/human-signals-1.1.1.tgz"
   "version" "1.1.1"
 
-"i18next@>= 19.0.0":
+"i18next@^19.9.2", "i18next@>= 19.0.0":
   "integrity" "sha512-0i6cuo6ER6usEOtKajUUDj92zlG+KArFia0857xxiEHAQcUwh/RtOQocui1LPJwunSYT574Pk64aNva1kwtxZg=="
   "resolved" "https://registry.npmjs.org/i18next/-/i18next-19.9.2.tgz"
   "version" "19.9.2"

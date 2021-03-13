@@ -5,6 +5,7 @@ import DestinationContext from "./contexts/DestinationContext";
 import Destination from "./screens/Destination";
 import { createStackNavigator } from "@react-navigation/stack";
 import Map from "./screens/Map";
+import "./i18n";
 
 const Stack = createStackNavigator();
 

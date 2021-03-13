@@ -123,7 +123,7 @@ const Destination = ({ navigation }: { navigation: StackNavigationProp<any, "Des
 	return (
 		<View style={{ flex: 1, padding: 24 }}>
 			<TextInput
-				placeholder="What's your destination?"
+				placeholder={t("whatsYourDestination")}
 				style={styles.placeInput}
 				onChangeText={(text: string) => setTypedDestination(text)}
 				value={typedDestination}
