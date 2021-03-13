@@ -13,6 +13,7 @@ import DestinationContext, { DestinationActions } from "../contexts/DestinationC
 import { StackNavigationProp } from "@react-navigation/stack";
 import { BASE_URL } from "../constants";
 import Geolocation, { GeolocationResponse } from "@react-native-community/geolocation";
+import { useTranslation } from "react-i18next";
 
 interface PlaceWithDistance {
 	place: Place;
@@ -70,6 +71,7 @@ const Destination = ({ navigation }: { navigation: StackNavigationProp<any, "Des
 	const [typedDestination, setTypedDestination] = useState<string>();
 	const destinationContext = useContext(DestinationContext.Context);
 	const [userLocation, setUserLocation] = useState<GeolocationResponse>();
+	const [t, i18n] = useTranslation();
 
 	useEffect(() => {
 		Geolocation.getCurrentPosition(
