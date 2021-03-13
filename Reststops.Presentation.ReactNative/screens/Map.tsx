@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useLayoutEffect, useState } from "react";
-import { StyleSheet, View, Text, ScrollView, ActivityIndicator, Button } from "react-native";
+import { StyleSheet, View, ActivityIndicator, Button } from "react-native";
 import DestinationContext from "../contexts/DestinationContext";
 import { BASE_URL } from "../constants";
 import { Reststop } from "../models/Reststop";
@@ -7,6 +7,7 @@ import ReststopsMap from "../components/ReststopsMap";
 import Geolocation, { GeolocationResponse } from "@react-native-community/geolocation";
 import ResultList from "../components/ResultList";
 import { useNavigation } from "@react-navigation/native";
+import { useTranslation } from "react-i18next";
 
 const Map = () => {
 	const [isLoading, setLoading] = useState(false);
@@ -15,6 +16,7 @@ const Map = () => {
 	const [userLocation, setUserLocation] = useState<GeolocationResponse>();
 	const destinationContext = useContext(DestinationContext.Context);
 	const navigation = useNavigation();
+	const [t] = useTranslation();
 
 	const getLocation = () => {
 		Geolocation.getCurrentPosition(
@@ -29,7 +31,7 @@ const Map = () => {
 
 	useLayoutEffect(() => {
 		navigation.setOptions({
-			headerRight: () => <Button onPress={getLocation} title="Refresh" />
+			headerRight: () => <Button onPress={getLocation} title={t("refresh")} />
 		});
 	}, [navigation]);
 

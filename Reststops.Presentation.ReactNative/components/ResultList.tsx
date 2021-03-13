@@ -1,91 +1,88 @@
 import React from "react";
 import { Reststop } from "../models/Reststop";
 import Timeline, { Data } from "react-native-timeline-flatlist";
+import { TFunction, useTranslation } from "react-i18next";
 
 export interface ResultListProps {
 	reststops: Reststop[];
 }
 
-const getDescription = (reststop: Reststop): string => {
+const getDescription = (reststop: Reststop, t: TFunction<string>): string => {
 	const amenetyOptions = [
 		{
 			condition: hasTag(reststop, "highway", "rest_area"),
-			amenety: "Rest area"
+			amenety: t("amenities.restArea")
 		},
 		{
 			condition: hasTag(reststop, "highway", "services"),
-			amenety: "Rest & service area"
+			amenety: t("amenities.servicesArea")
 		},
 		{
 			condition: hasTag(reststop, "toilets", "yes"),
-			amenety: "Toilets"
+			amenety: t("amenities.toilets")
 		},
 		{
 			condition: hasTag(reststop, "toilets", "no"),
-			amenety: "No toilets"
-		},
-		{
-			condition: hasTag(reststop, "highway", "services") || hasTag(reststop, "amenity", "fuel"),
-			amenety: "Gas station"
+			amenety: t("amenities.noToilets")
 		},
 		{
 			condition: hasTag(reststop, "baby_change", "yes"),
-			amenety: "Baby changing room"
+			amenety: t("amenities.babyChange")
 		},
 		{
 			condition: hasTag(reststop, "amenity", "parking"),
-			amenety: "Parking"
+			amenety: t("amenities.parking")
 		},
 		{
 			condition: hasTag(reststop, "tourism", "hotel"),
-			amenety: "Hotel"
+			amenety: t("amenities.hotel")
 		},
 		{
 			condition: hasTag(reststop, "caravan", "yes"),
-			amenety: "Caravan parking"
+			amenety: t("amenities.caravan")
 		},
 		{
 			condition: hasTag(reststop, "charging_station", "yes"),
-			amenety: "Charging station"
+			amenety: t("amenities.charginStation")
 		},
 		{
 			condition:
 				hasTag(reststop, "fast_food", "yes") ||
 				hasTag(reststop, "restaurant", "yes") ||
 				hasTag(reststop, "amenity", "restaurant"),
-			amenety: "Restaurant"
+			amenety: t("amenities.restaurant")
 		},
 		{
 			condition: hasTag(reststop, "shower", "yes"),
-			amenety: "Shower"
+			amenety: t("amenities.shower")
 		},
 		{
 			condition: hasTag(reststop, "wheelchair", "yes"),
-			amenety: "Wheelchair access"
+			amenety: t("amenities.wheelchairAccess")
 		},
 		{
 			condition: hasTag(reststop, "wheelchair", "no"),
-			amenety: "No wheelchair access"
+			amenety: t("amenities.noWheelchairAccess")
 		},
 		{
 			condition: hasTag(reststop, "waste_basket", "yes"),
-			amenety: "Waste bin"
+			amenety: t("amenities.wasteBasket")
 		},
 		{
 			condition: hasTag(reststop, "shop", "yes") || hasTag(reststop, "shop", "kiosk"),
-			amenety: "Shop"
+			amenety: t("amenities.shop")
 		},
 		{
 			condition: hasTag(reststop, "tourism", "information"),
-			amenety: "Tourist information"
+			amenety: t("amenities.touristInformation")
 		},
 		{
 			condition: hasTag(reststop, "drinking_water", "yes"),
-			amenety: "Drinking water"
+			amenety: t("amenities.drinkingWater")
 		},
 		{
 			condition: hasTag(reststop, "drinking_water", "no"),
-			amenety: "No drinking water"
+			amenety: t("amenities.noDrinkingWater")
 		}
 	];
 
@@ -114,14 +111,16 @@ const hasTag = (reststop: Reststop, tag: string, value: string) => {
 };
 
 const ResultList = (props: ResultListProps) => {
+	const [t] = useTranslation();
+
 	const timelineData: Data[] = props.reststops.map(
 		(reststop): Data => {
 			return {
 				time:
 					getDistanceAway(reststop) +
 					`\n+${(reststop.detourDurationInSeconds / 60).toFixed(0)} min`,
-				title: reststop.name || "Reststop",
-				description: getDescription(reststop)
+				title: reststop.name || t("reststop"),
+				description: getDescription(reststop, t)
 			};
 		}
 	);

@@ -1,3 +1,27 @@
 {
-	"whatsYourDestination": "What's your destination?"
+	"whatsYourDestination": "What's your destination?",
+	"setYourDestination": "Set your destination",
+	"reststops": "Reststops",
+	"refresh": "Refresh",
+	"reststop": "Reststop",
+	"amenities": {
+		"restArea": "Rest area",
+		"servicesArea": "Rest area, Gas station",
+		"toilets": "Toilets",
+		"noToilets": "No toilets",
+		"babyChange": "Baby changing room",
+		"parking": "Parking",
+		"hotel": "Hotel",
+		"caravan": "Caravan parking",
+		"charginStation": "Charging station",
+		"restaurant": "Restaurant",
+		"shower": "Shower",
+		"wheelchairAccess": "Wheelchair access",
+		"noWheelchairAccess": "No wheelchair access",
+		"wasteBasket": "Waste bin",
+		"shop": "Shop",
+		"touristInformation": "Tourist information",
+		"drinkingWater": "Drinking water",
+		"noDrinkingWater": "No drinking water"
+	}
 }

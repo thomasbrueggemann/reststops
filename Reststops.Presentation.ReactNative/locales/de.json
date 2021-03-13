@@ -1,3 +1,27 @@
 {
-	"whatsYourDestination": "Was ist dein Reiseziel?"
+	"whatsYourDestination": "Was ist dein Reiseziel?",
+	"setYourDestination": "Dein Reiseziel",
+	"reststops": "Rastplätze",
+	"refresh": "Neu laden",
+	"reststop": "Rastplatz",
+	"amenities": {
+		"restArea": "Rastplatz",
+		"servicesArea": "Rastplatz, Tankstelle",
+		"toilets": "Toiletten",
+		"noToilets": "Keine Toiletten",
+		"babyChange": "Wickelraum",
+		"parking": "Parkplatz",
+		"hotel": "Hotel",
+		"caravan": "Wohnwagen-Parkplätze",
+		"charginStation": "Ladestation",
+		"restaurant": "Restaurant",
+		"shower": "Dusche",
+		"wheelchairAccess": "Barriere-frei",
+		"noWheelchairAccess": "Nicht barriere-frei",
+		"wasteBasket": "Mülleimer",
+		"shop": "Shop",
+		"touristInformation": "Touristeninformation",
+		"drinkingWater": "Trinkwasser",
+		"noDrinkingWater": "Kein Trinkwasser"
+	}
 }

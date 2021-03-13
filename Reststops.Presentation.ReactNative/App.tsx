@@ -5,11 +5,14 @@ import DestinationContext from "./contexts/DestinationContext";
 import Destination from "./screens/Destination";
 import { createStackNavigator } from "@react-navigation/stack";
 import Map from "./screens/Map";
+import { useTranslation } from "react-i18next";
 import "./i18n";
 
 const Stack = createStackNavigator();
 
 const App = () => {
+	const [t, i18n] = useTranslation();
+
 	return (
 		<DestinationContext.ContextProvider>
 			<NavigationContainer>
@@ -18,9 +21,9 @@ const App = () => {
 					<Stack.Screen
 						name="Destination"
 						component={Destination}
-						options={{ title: "Set your destination" }}
+						options={{ title: t("setYourDestination") }}
 					/>
-					<Stack.Screen name="Map" component={Map} options={{ title: "Reststops" }} />
+					<Stack.Screen name="Map" component={Map} options={{ title: t("reststops") }} />
 				</Stack.Navigator>
 			</NavigationContainer>
 		</DestinationContext.ContextProvider>
