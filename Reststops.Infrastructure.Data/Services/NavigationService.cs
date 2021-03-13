@@ -12,14 +12,14 @@ namespace Reststops.Infrastructure.Services
 {
     public class NavigationService : INavigationService
     {
-        private readonly string _mapboxAPIToken;
+        private readonly string _mapboxApiToken;
         private readonly HttpClient _httpClient;
 
-        private const string PROFILE = "mapbox/driving";
+        private const string Profile = "mapbox/driving";
 
         public NavigationService(string mapboxAPIToken)
         {
-            _mapboxAPIToken = mapboxAPIToken ??
+            _mapboxApiToken = mapboxAPIToken ??
                 throw new ArgumentNullException(nameof(mapboxAPIToken));
 
             _httpClient = new HttpClient();
@@ -27,23 +27,21 @@ namespace Reststops.Infrastructure.Services
 
         #region Public Methods
 
-        public async Task<DirectionsRoute> GetDirections(
-            IEnumerable<Coordinate> coordinates
-        )
+        public async Task<DirectionsRoute> GetDirections(IEnumerable<Coordinate> coordinates)
         {
-            string coordinatesUrl = string.Join(
+            var coordinatesUrl = string.Join(
                 ';',
-                coordinates.Select(c => ToMapboxString(c))
+                coordinates.Select(ToMapboxString)
             );
 
-            HttpResponseMessage response = await _httpClient.GetAsync(
-                $"https://api.mapbox.com/directions/v5/{PROFILE}/{coordinatesUrl}" + 
-                $"?geometries=geojson&access_token={_mapboxAPIToken}"
-            );
+            var url = $"https://api.mapbox.com/directions/v5/{Profile}/{coordinatesUrl}" +
+                      $"?geometries=geojson&access_token={_mapboxApiToken}";
+
+            var response = await _httpClient.GetAsync(url);
 
             if (response.IsSuccessStatusCode)
             {
-                string body = await response.Content.ReadAsStringAsync();
+                var body = await response.Content.ReadAsStringAsync();
                 return JsonConvert.DeserializeObject<DirectionsRoute>(body);
             }
 
@@ -54,11 +52,11 @@ namespace Reststops.Infrastructure.Services
 
         #region Private Methods
 
-        private static string ToMapboxString(Coordinate coord)
-            => $"{coord.X},{coord.Y}";
+        private static string ToMapboxString(Coordinate coordinate)
+            => $"{coordinate.X},{coordinate.Y}";
 
-        private static string ToMapboxString(IEnumerable<Coordinate> coords)
-            => string.Join(';', coords.Select(c => ToMapboxString(c)));
+        private static string ToMapboxString(IEnumerable<Coordinate> coordinates)
+            => string.Join(';', coordinates.Select(ToMapboxString));
 
         #endregion
     }

@@ -6,6 +6,5 @@ namespace Reststops.Presentation.API.Models
     {
         public IEnumerable<ReststopModel> Reststops { get; init; }
         public string Route { get; init; }
-        public string ReststopsRoute { get; init; }
     }
 }

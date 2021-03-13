@@ -35,8 +35,8 @@ namespace Reststops.Infrastructure.Repositories
 
         public async Task Insert(Reststop reststop)
         {
-            ReststopDAO dao = _mapper.Map<ReststopDAO>(reststop);
-            
+            var dao = _mapper.Map<ReststopDAO>(reststop);
+
             var database = _mongoClient.GetDatabase (DbName);
             var collection = database.GetCollection<ReststopDAO> (ColName);
 
@@ -47,15 +47,14 @@ namespace Reststops.Infrastructure.Repositories
         {
             var database = _mongoClient.GetDatabase (DbName);
             var collection = database.GetCollection<ReststopDAO> (ColName);
-            
+
             var filter = Builders<ReststopDAO>.Filter.GeoWithinPolygon(
-                p => p.Location, 
+                p => p.Location,
                 GetCoordinatesArray(polygon));
-            
-            List<ReststopDAO> results = await collection.Find(filter).ToListAsync();
+
+            var results = await collection.Find(filter).ToListAsync();
 
             return _mapper.Map<List<Reststop>>(results);
-            return await Task.FromResult(new List<Reststop>());
         }
 
         #endregion
@@ -64,15 +63,15 @@ namespace Reststops.Infrastructure.Repositories
 
         private static double[,] GetCoordinatesArray(Polygon polygon)
             => polygon.Coordinates
-                .Select(c => GetCoordinateArray(c))
+                .Select(GetCoordinateArray)
                 .To2DArray();
 
         private static double[] GetCoordinateArray(Coordinate c)
-            => new double[] {
+            => new[] {
                 Math.Round(c.X, 5),
                 Math.Round(c.Y, 5)
             };
-        
+
         #endregion
     }
 }

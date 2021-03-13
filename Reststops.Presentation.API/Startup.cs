@@ -27,11 +27,8 @@ namespace Reststops.Presentation.API
                 options.AddDefaultPolicy(
                     builder =>
                     {
-                        builder.WithOrigins("http://localhost:5000",
-                                            "https://reststops.app",
-                                            "https://app.reststops.app",
-                                            "https://www.reststops.app",
-                                            "https://reststops.js.org")
+                        builder
+                            .AllowAnyOrigin()
                             .AllowAnyHeader()
                             .AllowAnyMethod()
                             .AllowCredentials();

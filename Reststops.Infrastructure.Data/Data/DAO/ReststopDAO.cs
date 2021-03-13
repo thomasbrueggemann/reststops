@@ -12,8 +12,8 @@ namespace Reststops.Infrastructure.Data.DAO
     {
         [JsonProperty("_id")]
         [BsonId]
-        public ObjectId _Id { get; set; }
-        
+        public ObjectId _Id { get; set; } = new ObjectId();
+
         [JsonProperty("id")]
         [Key]
         public string ID { get; set; }

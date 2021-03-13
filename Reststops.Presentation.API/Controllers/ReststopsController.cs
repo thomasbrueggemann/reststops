@@ -33,11 +33,8 @@ namespace Reststops.Presentation.API.Controllers
             _logger = logger;
             _mapper = mapper;
 
-            _reststopRepository = reststopRepository
-                ?? throw new ArgumentNullException(nameof(reststopRepository));
-
-            _navigationService = navigationService
-                ?? throw new ArgumentNullException(nameof(navigationService));
+            _reststopRepository = reststopRepository ?? throw new ArgumentNullException(nameof(reststopRepository));
+            _navigationService = navigationService ?? throw new ArgumentNullException(nameof(navigationService));
         }
 
         [HttpGet]
@@ -52,7 +49,7 @@ namespace Reststops.Presentation.API.Controllers
             var startCoordinate = new Coordinate(startLon, startLat);
             var endCoordinate = new Coordinate(endLon, endLat);
 
-            DirectionsRoute route = await _navigationService.GetDirections(
+            var route = await _navigationService.GetDirections(
                 new List<Coordinate>() { startCoordinate, endCoordinate}
             );
 
@@ -61,17 +58,14 @@ namespace Reststops.Presentation.API.Controllers
                 return NotFound("DirectionsRoute not found");
             }
 
-            Polygon bufferedPolygon = GetBufferedPolygonFromDirectionsRouteGeometry(route);
+            var bufferedPolygon = GetBufferedPolygonFromDirectionsRouteGeometry(route);
 
-            IEnumerable<Reststop> reststops = await _reststopRepository
+            var reststops = await _reststopRepository
                 .GetWithinPolygon(
                     startCoordinate,
                     bufferedPolygon
                 );
 
-            var boundingBox = GetReststopsBoundingBox(reststops);
-
-            // map entities to api models
             var reststopModels = _mapper.Map<IEnumerable<ReststopModel>>(
                 reststops
             );
@@ -90,13 +84,7 @@ namespace Reststops.Presentation.API.Controllers
             return Ok(new ReststopsModel
             {
                 Reststops = reststopModels,
-                Route = EncodedPolyline.Encode(route.Routes[0].Geometry.ToCoordinates()),
-                ReststopsRoute = EncodedPolyline.Encode(
-                    (await GetDetailedRouteGeometry(
-                        new Polyline(route.Routes[0].Geometry.ToCoordinates())
-                            .FitEnvelope(boundingBox)
-                    )).ToCoordinates()
-                )
+                Route = EncodedPolyline.Encode(route.Routes[0].Geometry.ToCoordinates())
             });
         }
 
@@ -109,17 +97,16 @@ namespace Reststops.Presentation.API.Controllers
         {
             var routedModels = new List<ReststopModel>();
 
-            foreach (ReststopModel model in models)
+            foreach (var model in models)
             {
-                double distance = double.MaxValue;
-                double detourDuration = double.MaxValue;
+                var distance = double.MaxValue;
+                var detourDuration = double.MaxValue;
 
-                // calculate route via this reststop to final destination
-                DirectionsRoute route = await _navigationService.GetDirections(
-                    new List<Coordinate>()
+                var route = await _navigationService.GetDirections(
+                    new List<Coordinate>
                     {
                         startCoordinate,
-                        new Coordinate(model.Longitude, model.Latitude),
+                        new (model.Longitude, model.Latitude),
                         endCoordinate
                     }
                 );
@@ -135,8 +122,8 @@ namespace Reststops.Presentation.API.Controllers
                 routedModels.Add(
                     model with
                     {
-                        DistanceInMeters = (int)Math.Round(distance),
-                        DetourDurationInSeconds = (int)Math.Round(detourDuration)
+                        DistanceInMeters = (int) Math.Round(distance),
+                        DetourDurationInSeconds = (int) Math.Round(detourDuration)
                     }
                 );
             }
@@ -152,29 +139,5 @@ namespace Reststops.Presentation.API.Controllers
                 )
                 .Buffer(0.02)
                 .Reverse() as Polygon;
-
-        private static Envelope GetReststopsBoundingBox(IEnumerable<Reststop> reststops)
-        {
-            var envelope = new Envelope();
-
-            foreach(var reststop in reststops)
-            {
-                envelope.ExpandToInclude(new Coordinate(
-                    reststop.Longitude,
-                    reststop.Latitude
-                ));
-            }
-
-            return envelope;
-        }
-
-        private async Task<Geometry> GetDetailedRouteGeometry(Polyline detailedPolyline)
-        {
-            var detailedRoute = await _navigationService.GetDirections(
-                detailedPolyline.GetCoordinates()
-            );
-
-            return detailedRoute.Routes[0].Geometry;
-        }
     }
 }

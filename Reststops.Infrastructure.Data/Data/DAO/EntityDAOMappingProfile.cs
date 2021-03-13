@@ -13,6 +13,7 @@ namespace Reststops.Infrastructure.Data.DAO
         public EntityDAOMappingProfile()
         {
             CreateMap<Reststop, ReststopDAO>()
+                .ForMember(dest => dest._Id, opt => opt.Ignore())
                 .ForMember(dest => dest.ID, opt => opt.MapFrom(src => src.ID.ToString()))
                 .ForMember(dest => dest.Location, opt => opt.MapFrom(src => new GeoJsonPoint<GeoJson2DGeographicCoordinates>(new GeoJson2DGeographicCoordinates(src.Longitude, src.Latitude))))
                 .ForMember(dest => dest.Type, opt => opt.MapFrom(src => Enum.GetName(typeof(ReststopType), src.Type)))
