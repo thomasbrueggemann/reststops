@@ -29,7 +29,7 @@ const App = () => {
 	return (
 		<DestinationContext.ContextProvider>
 			<NavigationContainer>
-				<StatusBar barStyle="dark-content" />
+				<StatusBar barStyle="light-content" />
 				<Stack.Navigator>
 					<Stack.Screen
 						name="Destination"

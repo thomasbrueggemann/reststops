@@ -1,10 +1,15 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Reststop } from "../models/Reststop";
 import Timeline, { Data } from "react-native-timeline-flatlist";
 import { TFunction, useTranslation } from "react-i18next";
+import ReststopContext, { ReststopActions } from "../contexts/ReststopContext";
 
 export interface ResultListProps {
 	reststops: Reststop[];
+}
+
+interface RowData extends Data {
+	id: number;
 }
 
 const getDescription = (reststop: Reststop, t: TFunction<string>): string => {
@@ -112,10 +117,12 @@ const hasTag = (reststop: Reststop, tag: string, value: string) => {
 
 const ResultList = (props: ResultListProps) => {
 	const [t] = useTranslation();
+	const reststopContext = useContext(ReststopContext.Context);
 
-	const timelineData: Data[] = props.reststops.map(
-		(reststop): Data => {
+	const timelineData: RowData[] = props.reststops.map(
+		(reststop): RowData => {
 			return {
+				id: reststop.id,
 				time:
 					getDistanceAway(reststop) +
 					`\n+${(reststop.detourDurationInSeconds / 60).toFixed(0)} min`,
@@ -129,7 +136,15 @@ const ResultList = (props: ResultListProps) => {
 		<Timeline
 			data={timelineData}
 			onEventPress={(event) => {
-				console.log(event);
+				if (reststopContext.dispatch) {
+					const rowData = event as RowData;
+
+					reststopContext.dispatch({
+						...reststopContext.state,
+						type: ReststopActions.SET_SELECTED,
+						selected: props.reststops.filter((reststop) => reststop.id === rowData.id)[0]
+					});
+				}
 			}}
 			innerCircle="dot"
 			separator={false}

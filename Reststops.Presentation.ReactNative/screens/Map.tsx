@@ -8,6 +8,7 @@ import ResultList from "../components/ResultList";
 import { useNavigation } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
 import Geolocation, { GeoPosition } from "react-native-geolocation-service";
+import ReststopContext from "../contexts/ReststopContext";
 
 const Map = () => {
 	const [isLoading, setLoading] = useState(false);
@@ -59,12 +60,18 @@ const Map = () => {
 
 	return (
 		<View style={{ flex: 1 }}>
-			<View style={styles.map}>
-				<ReststopsMap route={route} reststops={reststops}></ReststopsMap>
-			</View>
-			<View style={styles.results}>
-				{isLoading ? <ActivityIndicator /> : <ResultList reststops={reststops}></ResultList>}
-			</View>
+			<ReststopContext.ContextProvider>
+				<View style={styles.map}>
+					<ReststopsMap
+						route={route}
+						reststops={reststops}
+						userLocation={userLocation}
+					></ReststopsMap>
+				</View>
+				<View style={styles.results}>
+					{isLoading ? <ActivityIndicator /> : <ResultList reststops={reststops}></ResultList>}
+				</View>
+			</ReststopContext.ContextProvider>
 		</View>
 	);
 };

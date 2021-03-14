@@ -13,7 +13,7 @@ import DestinationContext, { DestinationActions } from "../contexts/DestinationC
 import { StackNavigationProp } from "@react-navigation/stack";
 import { BASE_URL } from "../constants";
 import { useTranslation } from "react-i18next";
-import Geolocation from "react-native-geolocation-service";
+import Geolocation, { GeoPosition } from "react-native-geolocation-service";
 
 interface PlaceWithDistance {
 	place: Place;
