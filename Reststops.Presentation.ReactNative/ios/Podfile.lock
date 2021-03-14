@@ -185,7 +185,7 @@ PODS:
     - React-cxxreact (= 0.63.4)
     - React-jsi (= 0.63.4)
   - React-jsinspector (0.63.4)
-  - react-native-geolocation (2.0.2):
+  - react-native-geolocation-service (5.2.0):
     - React
   - react-native-maps (0.27.1):
     - React
@@ -306,7 +306,7 @@ DEPENDENCIES:
   - React-jsi (from `../node_modules/react-native/ReactCommon/jsi`)
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
-  - "react-native-geolocation (from `../node_modules/@react-native-community/geolocation`)"
+  - react-native-geolocation-service (from `../node_modules/react-native-geolocation-service`)
   - react-native-maps (from `../node_modules/react-native-maps`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
@@ -360,8 +360,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/jsiexecutor"
   React-jsinspector:
     :path: "../node_modules/react-native/ReactCommon/jsinspector"
-  react-native-geolocation:
-    :path: "../node_modules/@react-native-community/geolocation"
+  react-native-geolocation-service:
+    :path: "../node_modules/react-native-geolocation-service"
   react-native-maps:
     :path: "../node_modules/react-native-maps"
   react-native-safe-area-context:
@@ -414,7 +414,7 @@ SPEC CHECKSUMS:
   React-jsi: a0418934cf48f25b485631deb27c64dc40fb4c31
   React-jsiexecutor: 93bd528844ad21dc07aab1c67cb10abae6df6949
   React-jsinspector: 58aef7155bc9a9683f5b60b35eccea8722a4f53a
-  react-native-geolocation: c956aeb136625c23e0dce0467664af2c437888c9
+  react-native-geolocation-service: 7c9436da6dfdecd9526c62eac62ea2bc3f0cc8ea
   react-native-maps: f4b89da81626ad7f151a8bfcb79733295d31ce5c
   react-native-safe-area-context: f0906bf8bc9835ac9a9d3f97e8bde2a997d8da79
   React-RCTActionSheet: 89a0ca9f4a06c1f93c26067af074ccdce0f40336
@@ -433,6 +433,6 @@ SPEC CHECKSUMS:
   RNScreens: f7ad633b2e0190b77b6a7aab7f914fad6f198d8d
   Yoga: 4bd86afe9883422a7c4028c00e34790f560923d6
 
-PODFILE CHECKSUM: 79886b6dd9cf0f7c751343b2b29a478271988673
+PODFILE CHECKSUM: a794594351f415fa07c43fe7c6a08e3aca75853e
 
 COCOAPODS: 1.10.1

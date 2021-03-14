@@ -128,6 +128,9 @@ const ResultList = (props: ResultListProps) => {
 	return (
 		<Timeline
 			data={timelineData}
+			onEventPress={(event) => {
+				console.log(event);
+			}}
 			innerCircle="dot"
 			separator={false}
 			circleSize={20}

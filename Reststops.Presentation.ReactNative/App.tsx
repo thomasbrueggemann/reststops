@@ -20,7 +20,7 @@ const App = () => {
 	const [t, i18n] = useTranslation();
 
 	useEffect(() => {
-		const locale = deviceLanguage.split("_")[0].split("-")[0];
+		const locale: string = deviceLanguage.split("_")[0].split("-")[0];
 		console.log("device language", deviceLanguage, "set locale to", locale);
 
 		i18n.changeLanguage(locale);

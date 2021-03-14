@@ -4,16 +4,16 @@ import DestinationContext from "../contexts/DestinationContext";
 import { BASE_URL } from "../constants";
 import { Reststop } from "../models/Reststop";
 import ReststopsMap from "../components/ReststopsMap";
-import Geolocation, { GeolocationResponse } from "@react-native-community/geolocation";
 import ResultList from "../components/ResultList";
 import { useNavigation } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
+import Geolocation, { GeoPosition } from "react-native-geolocation-service";
 
 const Map = () => {
 	const [isLoading, setLoading] = useState(false);
 	const [reststops, setReststops] = useState<Reststop[]>([]);
 	const [route, setRoute] = useState<string>();
-	const [userLocation, setUserLocation] = useState<GeolocationResponse>();
+	const [userLocation, setUserLocation] = useState<GeoPosition>();
 	const destinationContext = useContext(DestinationContext.Context);
 	const navigation = useNavigation();
 	const [t] = useTranslation();

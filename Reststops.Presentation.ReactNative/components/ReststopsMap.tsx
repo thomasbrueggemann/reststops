@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { StyleSheet } from "react-native";
-import MapView, { Marker, Polyline } from "react-native-maps";
+import MapView, { Marker, Polyline, UrlTile } from "react-native-maps";
 import { Reststop } from "../models/Reststop";
 
 const polyline = require("@mapbox/polyline");

@@ -12,8 +12,8 @@ import Place from "../models/Place";
 import DestinationContext, { DestinationActions } from "../contexts/DestinationContext";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { BASE_URL } from "../constants";
-import Geolocation, { GeolocationResponse } from "@react-native-community/geolocation";
 import { useTranslation } from "react-i18next";
+import Geolocation from "react-native-geolocation-service";
 
 interface PlaceWithDistance {
 	place: Place;
@@ -43,7 +43,7 @@ const distanceInMeters = (lat1: number, lon1: number, lat2: number, lon2: number
 
 const sortAndFilterPlacesByDistanceToCurrentLocation = (
 	places: Place[],
-	currentLocation: GeolocationResponse | undefined
+	currentLocation: GeoPosition | undefined
 ): Place[] => {
 	if (!currentLocation) return places;
 
@@ -70,7 +70,7 @@ const Destination = ({ navigation }: { navigation: StackNavigationProp<any, "Des
 	const [places, setPlaces] = useState<Place[]>([]);
 	const [typedDestination, setTypedDestination] = useState<string>();
 	const destinationContext = useContext(DestinationContext.Context);
-	const [userLocation, setUserLocation] = useState<GeolocationResponse>();
+	const [userLocation, setUserLocation] = useState<GeoPosition>();
 	const [t, i18n] = useTranslation();
 
 	useEffect(() => {
@@ -121,12 +121,13 @@ const Destination = ({ navigation }: { navigation: StackNavigationProp<any, "Des
 	};
 
 	return (
-		<View style={{ flex: 1, padding: 24 }}>
+		<View style={styles.screen}>
 			<TextInput
 				placeholder={t("whatsYourDestination")}
 				style={styles.placeInput}
 				onChangeText={(text: string) => setTypedDestination(text)}
 				value={typedDestination}
+				autoFocus={true}
 			/>
 			{isLoading ? (
 				<ActivityIndicator />
@@ -142,6 +143,10 @@ const Destination = ({ navigation }: { navigation: StackNavigationProp<any, "Des
 };
 
 const styles = StyleSheet.create({
+	screen: {
+		flex: 1,
+		padding: 18
+	},
 	item: {
 		backgroundColor: "#ddd",
 		borderRadius: 10,
@@ -149,8 +154,8 @@ const styles = StyleSheet.create({
 		marginVertical: 8
 	},
 	placeInput: {
-		height: 40,
-		borderColor: "gray",
+		height: 50,
+		borderColor: "#ccc",
 		borderWidth: 1,
 		backgroundColor: "white",
 		paddingLeft: 10,
