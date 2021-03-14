@@ -7,40 +7,35 @@ import ReststopsMap from "../components/ReststopsMap";
 import ResultList from "../components/ResultList";
 import { useNavigation } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
-import Geolocation, { GeoPosition } from "react-native-geolocation-service";
 import ReststopContext from "../contexts/ReststopContext";
+import useLocation from "../hooks/useLocation";
 
-const Map = () => {
+const Map = async () => {
 	const [isLoading, setLoading] = useState(false);
 	const [reststops, setReststops] = useState<Reststop[]>([]);
 	const [route, setRoute] = useState<string>();
-	const [userLocation, setUserLocation] = useState<GeoPosition>();
 	const destinationContext = useContext(DestinationContext.Context);
 	const navigation = useNavigation();
 	const [t] = useTranslation();
 
-	const getLocation = () => {
-		Geolocation.getCurrentPosition(
-			(info) => setUserLocation(info),
-			() => {},
-			{
-				enableHighAccuracy: true,
-				maximumAge: 0
-			}
-		);
-	};
+	const userLocation = await useLocation(
+		{
+			enableHighAccuracy: true
+		},
+		[]
+	);
 
 	useLayoutEffect(() => {
 		navigation.setOptions({
-			headerRight: () => <Button onPress={getLocation} title={t("refresh")} />
+			headerRight: () => <Button onPress={() => {}} title={t("refresh")} />
 		});
 	}, [navigation]);
-
-	useEffect(getLocation, []);
 
 	useEffect(() => {
 		const start = userLocation?.coords;
 		const end = destinationContext.state.destination;
+
+		console.log(start, end);
 
 		if (!start || !end) return;
 
@@ -51,6 +46,7 @@ const Map = () => {
 		)
 			.then((response) => response.json())
 			.then((json) => {
+				console.log(json);
 				setReststops(json.reststops);
 				setRoute(json.route);
 			})

@@ -13,7 +13,8 @@ import DestinationContext, { DestinationActions } from "../contexts/DestinationC
 import { StackNavigationProp } from "@react-navigation/stack";
 import { BASE_URL } from "../constants";
 import { useTranslation } from "react-i18next";
-import Geolocation, { GeoPosition } from "react-native-geolocation-service";
+import { GeoPosition } from "react-native-geolocation-service";
+import useLocation from "../hooks/useLocation";
 
 interface PlaceWithDistance {
 	place: Place;
@@ -65,24 +66,19 @@ const sortAndFilterPlacesByDistanceToCurrentLocation = (
 		.map((placeWithDistance) => placeWithDistance.place);
 };
 
-const Destination = ({ navigation }: { navigation: StackNavigationProp<any, "Destination"> }) => {
+const Destination = async ({ navigation }: { navigation: StackNavigationProp<any, "Destination"> }) => {
 	const [isLoading, setLoading] = useState(false);
 	const [places, setPlaces] = useState<Place[]>([]);
 	const [typedDestination, setTypedDestination] = useState<string>();
 	const destinationContext = useContext(DestinationContext.Context);
-	const [userLocation, setUserLocation] = useState<GeoPosition>();
 	const [t, i18n] = useTranslation();
 
-	useEffect(() => {
-		Geolocation.getCurrentPosition(
-			(info) => setUserLocation(info),
-			() => {},
-			{
-				enableHighAccuracy: true,
-				maximumAge: 0
-			}
-		);
-	}, []);
+	const userLocation = await useLocation(
+		{
+			enableHighAccuracy: true
+		},
+		[]
+	);
 
 	useEffect(() => {
 		const debounceTimer = setTimeout(() => {

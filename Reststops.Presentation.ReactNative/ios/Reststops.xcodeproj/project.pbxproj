@@ -20,6 +20,7 @@
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		CF95943EEF0215518A3A1E5C /* libPods-Reststops-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E50930862E5BCCBF93242C4 /* libPods-Reststops-tvOSTests.a */; };
 		DA5193E87E1B261122D64117 /* libPods-Reststops-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 824E4328F30733EF29A0EF65 /* libPods-Reststops-tvOS.a */; };
+		E92E22F725FE664F006F557D /* Empty.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92E22F625FE664F006F557D /* Empty.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -63,6 +64,8 @@
 		9E50930862E5BCCBF93242C4 /* libPods-Reststops-tvOSTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Reststops-tvOSTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2945CA1C37138874062A034 /* Pods-Reststops-ReststopsTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Reststops-ReststopsTests.debug.xcconfig"; path = "Target Support Files/Pods-Reststops-ReststopsTests/Pods-Reststops-ReststopsTests.debug.xcconfig"; sourceTree = "<group>"; };
 		AC8EC3B8A29DD8F6E1D864CF /* libPods-Reststops-ReststopsTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Reststops-ReststopsTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E92E22F525FE664F006F557D /* Reststops-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Reststops-Bridging-Header.h"; sourceTree = "<group>"; };
+		E92E22F625FE664F006F557D /* Empty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Empty.swift; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
 		F12F3A6BAD1F3F53CF43724A /* Pods-Reststops-tvOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Reststops-tvOSTests.debug.xcconfig"; path = "Target Support Files/Pods-Reststops-tvOSTests/Pods-Reststops-tvOSTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -132,6 +135,8 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB71A68108700A75B9A /* main.m */,
+				E92E22F625FE664F006F557D /* Empty.swift */,
+				E92E22F525FE664F006F557D /* Reststops-Bridging-Header.h */,
 			);
 			name = Reststops;
 			sourceTree = "<group>";
@@ -161,7 +166,6 @@
 				F12F3A6BAD1F3F53CF43724A /* Pods-Reststops-tvOSTests.debug.xcconfig */,
 				8DCF99FA7F40C0C8BB292B28 /* Pods-Reststops-tvOSTests.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -294,7 +298,8 @@
 						TestTargetID = 13B07F861A680F5B00A75B9A;
 					};
 					13B07F861A680F5B00A75B9A = {
-						LastSwiftMigration = 1120;
+						DevelopmentTeam = S49KXJ4SA3;
+						LastSwiftMigration = 1240;
 					};
 					2D02E47A1E0B4A5D006451C7 = {
 						CreatedOnToolsVersion = 8.2.1;
@@ -570,6 +575,7 @@
 			files = (
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
+				E92E22F725FE664F006F557D /* Empty.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -610,6 +616,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = A2945CA1C37138874062A034 /* Pods-Reststops-ReststopsTests.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -633,6 +640,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 9A1756BDB1B80C7CA68EE69D /* Pods-Reststops-ReststopsTests.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
 				INFOPLIST_FILE = ReststopsTests/Info.plist;
@@ -656,6 +664,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = S49KXJ4SA3;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Reststops/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -666,6 +675,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = Reststops;
+				SWIFT_OBJC_BRIDGING_HEADER = "Reststops-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -679,6 +689,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = S49KXJ4SA3;
 				INFOPLIST_FILE = Reststops/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = (
@@ -688,6 +699,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = Reststops;
+				SWIFT_OBJC_BRIDGING_HEADER = "Reststops-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
