@@ -1,0 +1,27 @@
+{
+	"whatsYourDestination": "Vad är din destination?",
+	"destination": "Destination",
+	"reststops": "Resten slutar",
+	"refresh": "Uppdatera",
+	"reststop": "Vila stopp",
+	"amenities": {
+		"restArea": "Viloplats",
+		"servicesArea": "Rastplats, bensinstation",
+		"toilets": "Toaletter",
+		"noToilets": "Inga toaletter",
+		"babyChange": "Baby omklädningsrum",
+		"parking": "Parkering",
+		"hotel": "Hotell",
+		"caravan": "Husvagnsparkering",
+		"charginStation": "Laddnings station",
+		"restaurant": "Restaurang",
+		"shower": "Dusch",
+		"wheelchairAccess": "Rullstolsanpassad",
+		"noWheelchairAccess": "Ingen rullstol",
+		"wasteBasket": "Soptunna",
+		"shop": "Affär",
+		"touristInformation": "Turistinformation",
+		"drinkingWater": "Dricker vatten",
+		"noDrinkingWater": "Inget dricksvatten"
+	}
+}

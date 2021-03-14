@@ -1,9 +1,9 @@
 {
 	"whatsYourDestination": "What's your destination?",
 	"destination": "Destination",
-	"reststops": "Reststops",
+	"reststops": "Rest stops",
 	"refresh": "Refresh",
-	"reststop": "Reststop",
+	"reststop": "Rest stop",
 	"amenities": {
 		"restArea": "Rest area",
 		"servicesArea": "Rest area, Gas station",

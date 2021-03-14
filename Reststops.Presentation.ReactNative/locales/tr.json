@@ -1,0 +1,27 @@
+{
+	"whatsYourDestination": "Hedefiniz neresi?",
+	"destination": "Hedef",
+	"reststops": "Dinlenme durur",
+	"refresh": "Yenile",
+	"reststop": "Dinlenme dur",
+	"amenities": {
+		"restArea": "Dinlenme alanı",
+		"servicesArea": "Dinlenme alanı, Benzin istasyonu",
+		"toilets": "Tuvaletler",
+		"noToilets": "Tuvalet yok",
+		"babyChange": "Bebek soyunma odası",
+		"parking": "Otopark",
+		"hotel": "Otel",
+		"caravan": "Karavan park yeri",
+		"charginStation": "Şarj istasyonu",
+		"restaurant": "Restoran",
+		"shower": "Duş",
+		"wheelchairAccess": "Tekerlekli sandalye girişi",
+		"noWheelchairAccess": "Tekerlekli sandalyeye erişim yok",
+		"wasteBasket": "Çöp Kutusu",
+		"shop": "Dükkan",
+		"touristInformation": "Turizm Danışma",
+		"drinkingWater": "İçme suyu",
+		"noDrinkingWater": "İçme suyu yok"
+	}
+}

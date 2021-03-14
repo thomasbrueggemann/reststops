@@ -1,0 +1,27 @@
+{
+	"whatsYourDestination": "Wat is je bestemming?",
+	"destination": "Bestemming",
+	"reststops": "Rustplaatsen",
+	"refresh": "Vernieuwen",
+	"reststop": "Rustplaats",
+	"amenities": {
+		"restArea": "Rustplaats",
+		"servicesArea": "Rustplaats, benzinestation",
+		"toilets": "Toiletten",
+		"noToilets": "Geen toiletten",
+		"babyChange": "Baby kleedkamer",
+		"parking": "Parkeren",
+		"hotel": "Hotel",
+		"caravan": "Caravan parkeerplaats",
+		"charginStation": "Oplaadstation",
+		"restaurant": "Restaurant",
+		"shower": "Douche",
+		"wheelchairAccess": "Toegang voor rolstoelgebruikers",
+		"noWheelchairAccess": "Geen toegang voor rolstoelgebruikers",
+		"wasteBasket": "Afvalbak",
+		"shop": "Winkel",
+		"touristInformation": "Toeristische informatie",
+		"drinkingWater": "Drinkwater",
+		"noDrinkingWater": "Geen drinkwater"
+	}
+}

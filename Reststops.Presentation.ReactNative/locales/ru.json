@@ -1,0 +1,27 @@
+{
+	"whatsYourDestination": "Каково ваше место назначения?",
+	"destination": "Назначение",
+	"reststops": "Reststops",
+	"refresh": "Обновить",
+	"reststop": "Reststop",
+	"amenities": {
+		"restArea": "Зона отдыха",
+		"servicesArea": "Зона отдыха, АЗС",
+		"toilets": "Туалеты",
+		"noToilets": "Нет туалетов",
+		"babyChange": "Детская комната для переодевания",
+		"parking": "Парковка",
+		"hotel": "Отель",
+		"caravan": "парковка для караванов",
+		"charginStation": "Зарядная станция",
+		"restaurant": "Ресторан",
+		"shower": "Показать",
+		"wheelchairAccess": "Доступ для инвалидных колясок",
+		"noWheelchairAccess": "Нет доступа для инвалидных колясок",
+		"wasteBasket": "мусорная корзина",
+		"shop": "Магазин",
+		"touristInformation": "Туристическая информация",
+		"drinkingWater": "питьевая вода",
+		"noDrinkingWater": "Нет питьевой воды"
+	}
+}

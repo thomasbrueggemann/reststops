@@ -1,0 +1,27 @@
+{
+	"whatsYourDestination": "あなたの目的地はどこですか？",
+	"destination": "目的地",
+	"reststops": "休憩場所",
+	"refresh": "リフレッシュ",
+	"reststop": "レストストップ",
+	"amenities": {
+		"restArea": "休憩所",
+		"servicesArea": "レストエリア、ガソリンスタンド",
+		"toilets": "お手洗い",
+		"noToilets": "トイレなし",
+		"babyChange": "赤ちゃん用更衣室",
+		"parking": "駐車場",
+		"hotel": "ホテル",
+		"caravan": "キャラバンパーキング",
+		"charginStation": "充電スタンド",
+		"restaurant": "レストラン",
+		"shower": "シャワー",
+		"wheelchairAccess": "車椅子対応",
+		"noWheelchairAccess": "車椅子での移動はできません。",
+		"wasteBasket": "ゴミ箱",
+		"shop": "ショップ",
+		"touristInformation": "観光情報",
+		"drinkingWater": "飲料水",
+		"noDrinkingWater": "飲料水なし"
+	}
+}
