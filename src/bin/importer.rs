@@ -1,8 +1,9 @@
 use anyhow::Result;
 use mongodb::bson::{doc, DateTime};
+use mongodb::options::ReplaceOptions;
 use mongodb::{options::ClientOptions, Client};
 use osmpbfreader::Tags;
-use reststops::reststop::Reststop;
+use reststops::reststop::{Location, Reststop, ReststopCategory};
 use std::collections::HashMap;
 use std::env;
 use std::fs::File;
@@ -14,13 +15,15 @@ pub async fn main() -> Result<()> {
 
     let connection_string = env::var("MONGO_CONNECTION_STRING")
         .unwrap_or("mongodb://test:test@localhost:25015".to_string());
-
     let opts = ClientOptions::parse(connection_string).await?;
     let client = Client::with_options(opts)?;
 
-    let filename = "berlin-latest.osm.pbf";
-    let r = File::open(&std::path::Path::new(filename)).unwrap();
+    let args: Vec<String> = env::args().collect();
+    let filepath = &args[1];
+
+    let r = File::open(&std::path::Path::new(filepath)).unwrap();
     let mut pbf = osmpbfreader::OsmPbfReader::new(r);
+
     let objs = pbf
         .get_objs_and_deps(|obj| {
             obj.is_node()
@@ -41,34 +44,53 @@ pub async fn main() -> Result<()> {
                 .tags
                 .iter()
                 .map(|(key, value)| (key.to_string(), value.to_string()))
-                .filter(|(key, _value)| !key.eq("name") && !key.eq("description"))
+                .filter(|(key, _value)| {
+                    !key.eq("name") && !key.eq("description") && !key.eq("highway")
+                })
                 .collect();
 
             let description = get_optional_tag_value(&node.tags, "description");
             let name = get_optional_tag_value(&node.tags, "name");
 
+            let category = if node.tags.contains("highway", "services") {
+                ReststopCategory::Services
+            } else {
+                ReststopCategory::Restarea
+            };
+
+            let location = Location {
+                r#type: "Point".to_string(),
+                coordinates: vec![node.lon(), node.lat()],
+            };
+
             Reststop {
                 id: id.inner_id(),
                 name,
+                category,
                 description,
-                latitude: node.lat(),
-                longitude: node.lon(),
+                location,
                 last_updated_utc: DateTime::now(),
                 tags,
             }
         })
         .collect();
 
-    println!("Parse OSM PBF file:\t\t{} secs", now.elapsed().as_secs());
+    println!("Parsed OSM PBF file:\t\t\t{} secs", now.elapsed().as_secs());
     now = Instant::now();
 
-    for reststop in reststops {
+    for reststop in &reststops {
+        let replace_options = ReplaceOptions::builder().upsert(true).build();
+
         reststops_col
-            .replace_one(doc! { "_id": reststop.id }, reststop, None)
+            .replace_one(doc! { "_id": reststop.id }, reststop, replace_options)
             .await?;
     }
 
-    println!("Upsert to MongoDB:\t\t{} secs", now.elapsed().as_secs());
+    println!(
+        "Upserted {} reststops to MongoDB:\t{} secs",
+        reststops.len(),
+        now.elapsed().as_secs()
+    );
 
     Ok(())
 }
