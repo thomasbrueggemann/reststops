@@ -1,3 +1,3 @@
-pub mod coordinate;
+pub mod buffer;
 pub mod osrm;
 pub mod reststop;

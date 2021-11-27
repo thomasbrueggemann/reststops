@@ -1,6 +1,6 @@
 pub struct Coordinate {
-    longitude: f64,
-    latitude: f64,
+    pub longitude: f64,
+    pub latitude: f64,
 }
 
 impl Coordinate {

@@ -188,6 +188,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "clipper-sys"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5928e5e0e1a0456c032695cc9b258fc3354d560902a2a32b506afa95360d686e"
+dependencies = [
+ "cc",
+]
+
+[[package]]
 name = "const_fn"
 version = "0.4.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -568,6 +577,25 @@ checksum = "501466ecc8a30d1d3b7fc9229b122b2ce8ed6e9d9223f1138d4babb253e51817"
 dependencies = [
  "typenum",
  "version_check",
+]
+
+[[package]]
+name = "geo-clipper"
+version = "0.7.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0ba51b7ade4858658480c45b23c07b76a7ca944057428c5c4673c28da3745973"
+dependencies = [
+ "clipper-sys",
+ "geo-types",
+]
+
+[[package]]
+name = "geo-types"
+version = "0.7.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d8bd2e95dd9f5c8ff74159ed9205ad7fd239a9569173a550863976421b45d2bb"
+dependencies = [
+ "num-traits",
 ]
 
 [[package]]
@@ -1230,6 +1258,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "12295df4f294471248581bc09bef3c38a5e46f1e36d6a37353621a0c6c357e1f"
 
 [[package]]
+name = "polyline"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b4fb271c371b801041a8eaa6046cf694f84dd21817610f5ba962efd273f47779"
+dependencies = [
+ "geo-types",
+]
+
+[[package]]
 name = "ppv-lite86"
 version = "0.2.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1461,8 +1498,12 @@ name = "reststops"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "futures 0.3.18",
+ "geo-clipper",
+ "geo-types",
  "mongodb",
  "osmpbfreader",
+ "polyline",
  "reqwest",
  "rocket",
  "serde",
