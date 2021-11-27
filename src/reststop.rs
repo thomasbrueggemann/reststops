@@ -22,7 +22,9 @@ pub struct Location {
 pub struct Reststop {
     #[serde(rename(serialize = "_id"))]
     pub id: i64,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
     pub category: ReststopCategory,
     pub location: Location,
