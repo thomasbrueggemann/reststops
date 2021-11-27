@@ -4,9 +4,8 @@ extern crate rocket;
 use ::reststops::buffer::Buffer;
 use ::reststops::osrm::Osrm;
 use ::reststops::reststop::{Reststop, ReststopCategory};
-use futures::future::join_all;
 use futures::stream::TryStreamExt;
-use geo_types::{Coordinate, LineString};
+use geo_types::{Coordinate, Line, LineString};
 use mongodb::bson::doc;
 use mongodb::options::{ClientOptions, FindOptions};
 use mongodb::{Client, Collection};
@@ -68,19 +67,38 @@ async fn reststops(
     };
 
     let route = Osrm::route(vec![start, end]).await.unwrap();
-    let reststops = get_reststops(route).await;
+    let mut reststops = get_reststops(route).await;
 
-    let durations = get_duration_table(start, end, &reststops).await;
-    let responses = assign_durations_to_reststops(&durations, &reststops);
+    let closest_reststops = filter_closest_reststops(&mut reststops, start);
 
-    println!("{} reststops found", reststops.len());
+    let durations = get_duration_table(start, end, &closest_reststops).await;
+    let responses = assign_durations_to_reststops(&durations, &closest_reststops);
+
+    println!("{} reststops found", closest_reststops.len());
 
     Json(responses)
 }
 
+fn filter_closest_reststops(
+    reststops: &mut Vec<Reststop>,
+    start: Coordinate<f64>,
+) -> Vec<&Reststop> {
+    reststops.sort_by(|a, b| {
+        let line_a = Line::new(start, a.to_coordinate());
+        let line_b = Line::new(start, b.to_coordinate());
+
+        let distance_a = line_a.dx() + line_a.dy();
+        let distance_b = line_b.dx() + line_b.dy();
+
+        distance_b.partial_cmp(&distance_a).unwrap()
+    });
+
+    reststops.iter().take(25).collect()
+}
+
 fn assign_durations_to_reststops(
     durations: &Vec<Vec<f64>>,
-    reststops: &Vec<Reststop>,
+    reststops: &Vec<&Reststop>,
 ) -> Vec<ReststopResponse> {
     let total_duration = durations[0][reststops.len() - 1];
 
@@ -102,7 +120,7 @@ fn assign_durations_to_reststops(
 async fn get_duration_table(
     start: Coordinate<f64>,
     end: Coordinate<f64>,
-    reststops: &Vec<Reststop>,
+    reststops: &Vec<&Reststop>,
 ) -> Vec<Vec<f64>> {
     let mut distance_coords: Vec<Coordinate<f64>> = vec![start];
     let mut reststop_coords: Vec<Coordinate<f64>> = reststops
@@ -138,11 +156,9 @@ async fn get_reststops(route: LineString<f64>) -> Vec<Reststop> {
         }
     };
 
-    let find_options = FindOptions::builder().limit(100).build();
-
     let reststops_col = get_reststops_collection().await;
     let result: Vec<Reststop> = reststops_col
-        .find(filter, find_options)
+        .find(filter, None)
         .await
         .unwrap()
         .try_collect()
