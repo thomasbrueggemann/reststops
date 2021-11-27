@@ -4,21 +4,24 @@ extern crate rocket;
 use ::reststops::buffer::Buffer;
 use ::reststops::osrm::Osrm;
 use ::reststops::reststop::{Reststop, ReststopCategory};
+use futures::future::join_all;
 use futures::stream::TryStreamExt;
-use geo_types::Coordinate;
+use futures::Future;
+use geo_types::{Coordinate, LineString};
 use mongodb::bson::doc;
 use mongodb::options::ClientOptions;
 use mongodb::{Client, Collection};
 use rocket::fairing::{Fairing, Info, Kind};
 use rocket::http::Header;
-use rocket::response::content::Json;
+use rocket::serde::json::Json;
+use rocket::serde::Serialize;
 use rocket::{Request, Response};
-use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::env;
 
-#[derive(Debug, Serialize, Deserialize)]
-struct ReststopDTO {
+#[derive(Serialize)]
+#[serde(crate = "rocket::serde")]
+struct ReststopResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -27,6 +30,19 @@ struct ReststopDTO {
     pub location: Vec<f64>,
     pub tags: HashMap<String, String>,
     pub detour_seconds: u32,
+}
+
+impl ReststopResponse {
+    pub fn from(reststop: &Reststop, detour_seconds: u32) -> ReststopResponse {
+        ReststopResponse {
+            name: reststop.name.to_owned(),
+            description: reststop.description.to_owned(),
+            category: reststop.category,
+            location: reststop.location.coordinates.to_owned(),
+            tags: reststop.tags.to_owned(),
+            detour_seconds,
+        }
+    }
 }
 
 #[get("/")]
@@ -41,7 +57,7 @@ async fn reststops(
     end_lon: f64,
     end_lat: f64,
     max_detour_seconds: i32,
-) -> Json<Vec<u8>> {
+) -> Json<Vec<ReststopResponse>> {
     let start = Coordinate {
         x: start_lon,
         y: start_lat,
@@ -53,6 +69,28 @@ async fn reststops(
     };
 
     let route = Osrm::route(vec![start, end]).await.unwrap();
+    let reststops = get_reststops(route).await;
+
+    println!("{} reststops found", reststops.len());
+
+    let response_reststops = reststops
+        .iter()
+        .map(|reststop| async {
+            let detour = Osrm::route(vec![start, reststop.to_coordinate(), end])
+                .await
+                .unwrap();
+
+            ReststopResponse::from(reststop, 0)
+        })
+        .collect::<Vec<Future<ReststopResponse>>>();
+
+    let joined = join_all(response_reststops).await;
+    // TODO: enrich with detours
+
+    Json(response_reststops)
+}
+
+async fn get_reststops(route: LineString<f64>) -> Vec<Reststop> {
     let buffered_route = route.buffer(4.0, 10.0);
 
     let buffered_coordinates: Vec<Vec<f64>> = buffered_route
@@ -72,8 +110,6 @@ async fn reststops(
         }
     };
 
-    println!("{}", filter);
-
     let reststops_col = get_reststops_collection().await;
     let result: Vec<Reststop> = reststops_col
         .find(filter, None)
@@ -83,11 +119,7 @@ async fn reststops(
         .await
         .unwrap();
 
-    println!("{} reststops found", result.len());
-
-    // TODO: enrich with detours
-
-    Json(vec![32])
+    return result;
 }
 
 async fn get_reststops_collection() -> Collection<Reststop> {

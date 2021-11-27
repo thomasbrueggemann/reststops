@@ -4,7 +4,7 @@ use geo_types::Coordinate;
 use mongodb::bson::DateTime;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Copy, Clone)]
 pub enum ReststopCategory {
     #[serde(rename = "restarea")]
     Restarea,
