@@ -13,8 +13,7 @@ use std::time::Instant;
 pub async fn main() -> Result<()> {
     let mut now = Instant::now();
 
-    let connection_string = env::var("MONGO_CONNECTION_STRING")
-        .unwrap_or("mongodb://test:test@localhost:25015".to_string());
+    let connection_string = env::var("MONGO_CONNECTION_STRING").unwrap();
     let opts = ClientOptions::parse(connection_string).await?;
     let client = Client::with_options(opts)?;
 

@@ -2,12 +2,15 @@
 extern crate rocket;
 
 use ::reststops::buffer::Buffer;
+use ::reststops::circle::Circle;
 use ::reststops::osrm::Osrm;
 use ::reststops::reststop::{Reststop, ReststopCategory};
 use futures::stream::TryStreamExt;
-use geo_types::{Coordinate, Line, LineString};
+use geo::prelude::HaversineDistance;
+use geo::{Coordinate, LineString, Point, Polygon};
+use geo_clipper::Clipper;
 use mongodb::bson::doc;
-use mongodb::options::{ClientOptions, FindOptions};
+use mongodb::options::ClientOptions;
 use mongodb::{Client, Collection};
 use rocket::fairing::{Fairing, Info, Kind};
 use rocket::http::Header;
@@ -67,9 +70,11 @@ async fn reststops(
     };
 
     let route = Osrm::route(vec![start, end]).await.unwrap();
-    let mut reststops = get_reststops(route).await;
+    let mut reststops = get_reststops(route, start).await;
 
-    let closest_reststops = filter_closest_reststops(&mut reststops, start);
+    let closest_reststops = filter_closest_reststops(&mut reststops, Point::from(start));
+
+    println!("{}", closest_reststops.len());
 
     let durations = get_duration_table(start, end, &closest_reststops).await;
     let responses = assign_durations_to_reststops(&durations, &closest_reststops);
@@ -79,21 +84,15 @@ async fn reststops(
     Json(responses)
 }
 
-fn filter_closest_reststops(
-    reststops: &mut Vec<Reststop>,
-    start: Coordinate<f64>,
-) -> Vec<&Reststop> {
+fn filter_closest_reststops(reststops: &mut Vec<Reststop>, start: Point<f64>) -> Vec<&Reststop> {
     reststops.sort_by(|a, b| {
-        let line_a = Line::new(start, a.to_coordinate());
-        let line_b = Line::new(start, b.to_coordinate());
+        let distance_a = start.haversine_distance(&a.to_point());
+        let distance_b = start.haversine_distance(&b.to_point());
 
-        let distance_a = line_a.dx() + line_a.dy();
-        let distance_b = line_b.dx() + line_b.dy();
-
-        distance_b.partial_cmp(&distance_a).unwrap()
+        distance_a.partial_cmp(&distance_b).unwrap()
     });
 
-    reststops.iter().take(25).collect()
+    reststops.iter().take(23).collect()
 }
 
 fn assign_durations_to_reststops(
@@ -101,7 +100,6 @@ fn assign_durations_to_reststops(
     reststops: &Vec<&Reststop>,
 ) -> Vec<ReststopResponse> {
     let total_duration = durations[0][reststops.len() - 1];
-
     let mut response_reststops: Vec<ReststopResponse> = vec![];
 
     for i in 0..reststops.len() - 1 {
@@ -136,10 +134,15 @@ async fn get_duration_table(
     return table;
 }
 
-async fn get_reststops(route: LineString<f64>) -> Vec<Reststop> {
+async fn get_reststops(route: LineString<f64>, start: Coordinate<f64>) -> Vec<Reststop> {
     let buffered_route = route.buffer(4.0, 10.0);
+    let circle_around_start = Polygon::circle(start, 80000, 5);
 
-    let buffered_coordinates: Vec<Vec<f64>> = buffered_route
+    let sector = buffered_route.intersection(&circle_around_start, 1.);
+    let sector_coordinates: Vec<Vec<f64>> = sector
+        .iter()
+        .next()
+        .unwrap()
         .exterior()
         .points_iter()
         .map(|point| vec![point.x(), point.y()])
@@ -150,7 +153,7 @@ async fn get_reststops(route: LineString<f64>) -> Vec<Reststop> {
             "$geoWithin": {
                 "$geometry": {
                     "type": "Polygon",
-                    "coordinates": vec![buffered_coordinates]
+                    "coordinates": vec![sector_coordinates]
                 }
             }
         }
@@ -169,8 +172,7 @@ async fn get_reststops(route: LineString<f64>) -> Vec<Reststop> {
 }
 
 async fn get_reststops_collection() -> Collection<Reststop> {
-    let connection_string = env::var("MONGO_CONNECTION_STRING")
-        .unwrap_or("mongodb://test:test@localhost:25015".to_string());
+    let connection_string = env::var("MONGO_CONNECTION_STRING").unwrap();
 
     let opts = ClientOptions::parse(connection_string).await.unwrap();
     let client = Client::with_options(opts).unwrap();

@@ -1,5 +1,7 @@
+use std::env;
+
 use anyhow::Result;
-use geo_types::{Coordinate, LineString};
+use geo::{Coordinate, LineString};
 use polyline;
 use serde::{Deserialize, Serialize};
 
@@ -55,27 +57,28 @@ pub struct Waypoint {
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct TableResult {
     pub code: String,
     pub durations: Vec<Vec<f64>>,
-    pub sources: Vec<Source>,
     pub destinations: Vec<Destination>,
+    pub sources: Vec<Source>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct Source {
-    pub hint: String,
-    pub distance: f64,
-    pub location: Vec<f64>,
-    pub name: String,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Destination {
-    pub hint: String,
     pub distance: f64,
-    pub location: Vec<f64>,
     pub name: String,
+    pub location: Vec<f64>,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Source {
+    pub distance: f64,
+    pub name: String,
+    pub location: Vec<f64>,
 }
 
 pub struct Osrm {}
@@ -110,10 +113,8 @@ impl Osrm {
             base_url,
             service,
             url_coordinate_strings.join(";"),
-            ""
+            env::var("MAPBOX_API_TOKEN").unwrap()
         );
-
-        println!("{}", url);
 
         return url;
     }

@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use geo_types::Coordinate;
+use geo::{point, Coordinate, Point};
 use mongodb::bson::DateTime;
 use serde::{Deserialize, Serialize};
 
@@ -39,5 +39,9 @@ impl Reststop {
             x: self.location.coordinates[0],
             y: self.location.coordinates[1],
         }
+    }
+
+    pub fn to_point(&self) -> Point<f64> {
+        point!(x: self.location.coordinates[0], y: self.location.coordinates[1])
     }
 }

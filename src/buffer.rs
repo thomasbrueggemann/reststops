@@ -1,5 +1,5 @@
+use geo::{LineString, MultiPolygon, Polygon};
 use geo_clipper::{Clipper, EndType, JoinType};
-use geo_types::{LineString, MultiPolygon, Polygon};
 
 pub trait Buffer {
     fn buffer(&self, delta: f64, factor: f64) -> Polygon<f64>;
