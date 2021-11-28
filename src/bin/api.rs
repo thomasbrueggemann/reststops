@@ -74,12 +74,11 @@ async fn reststops(
 
     let closest_reststops = filter_closest_reststops(&mut reststops, Point::from(start));
 
-    println!("{}", closest_reststops.len());
-
     let durations = get_duration_table(start, end, &closest_reststops).await;
-    let responses = assign_durations_to_reststops(&durations, &closest_reststops);
-
-    println!("{} reststops found", closest_reststops.len());
+    let responses = assign_durations_to_reststops(&durations, &closest_reststops)
+        .into_iter()
+        .filter(|response| response.detour_seconds <= max_detour_seconds)
+        .collect::<Vec<ReststopResponse>>();
 
     Json(responses)
 }
@@ -111,6 +110,8 @@ fn assign_durations_to_reststops(
 
         response_reststops.push(response_reststop);
     }
+
+    response_reststops.sort_by(|a, b| a.detour_seconds.partial_cmp(&b.detour_seconds).unwrap());
 
     return response_reststops;
 }
