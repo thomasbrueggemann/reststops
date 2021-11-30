@@ -4,21 +4,18 @@ extern crate rocket;
 use ::reststops::buffer::Buffer;
 use ::reststops::circle::Circle;
 use ::reststops::osrm::Osrm;
+use ::reststops::overpass::Overpass;
 use ::reststops::reststop::{Reststop, ReststopCategory};
-use futures::stream::TryStreamExt;
-use geo::prelude::HaversineDistance;
+use geo::algorithm::bounding_rect::BoundingRect;
+use geo::prelude::{Contains, HaversineDistance};
 use geo::{Coordinate, LineString, Point, Polygon};
 use geo_clipper::Clipper;
-use mongodb::bson::doc;
-use mongodb::options::ClientOptions;
-use mongodb::{Client, Collection};
 use rocket::fairing::{Fairing, Info, Kind};
 use rocket::http::Header;
 use rocket::serde::json::Json;
 use rocket::serde::Serialize;
 use rocket::{Request, Response};
 use std::collections::HashMap;
-use std::env;
 
 #[derive(Serialize)]
 #[serde(crate = "rocket::serde")]
@@ -73,6 +70,10 @@ async fn reststops(
     let mut reststops = get_reststops(route, start).await;
 
     let closest_reststops = filter_closest_reststops(&mut reststops, Point::from(start));
+
+    if closest_reststops.len() == 0 {
+        return Json(vec![]);
+    }
 
     let durations = get_duration_table(start, end, &closest_reststops).await;
     let responses = assign_durations_to_reststops(&durations, &closest_reststops)
@@ -136,51 +137,29 @@ async fn get_duration_table(
 }
 
 async fn get_reststops(route: LineString<f64>, start: Coordinate<f64>) -> Vec<Reststop> {
-    let buffered_route = route.buffer(4.0, 10.0);
-    let circle_around_start = Polygon::circle(start, 80000, 5);
+    let buffered_route = route.buffer(0.03);
+    let circle_around_start = Polygon::circle(start, 50_000, 5);
 
-    let sector = buffered_route.intersection(&circle_around_start, 1.);
-    let sector_coordinates: Vec<Vec<f64>> = sector
-        .iter()
-        .next()
-        .unwrap()
-        .exterior()
-        .points_iter()
-        .map(|point| vec![point.x(), point.y()])
+    let sectors = buffered_route.intersection(&circle_around_start, 1000.);
+    let sector: Polygon<f64> = sectors.into_iter().next().unwrap();
+
+    let sector_bbox = sector.bounding_rect().unwrap();
+
+    let overpass_reststops = Overpass::query(
+        sector_bbox.min().x,
+        sector_bbox.max().y,
+        sector_bbox.max().x,
+        sector_bbox.min().y,
+    )
+    .await
+    .unwrap();
+
+    let result: Vec<Reststop> = overpass_reststops
+        .into_iter()
+        .filter(|reststop| sector.contains(&reststop.to_coordinate()))
         .collect();
 
-    let filter = doc! {
-        "location": {
-            "$geoWithin": {
-                "$geometry": {
-                    "type": "Polygon",
-                    "coordinates": vec![sector_coordinates]
-                }
-            }
-        }
-    };
-
-    let reststops_col = get_reststops_collection().await;
-    let result: Vec<Reststop> = reststops_col
-        .find(filter, None)
-        .await
-        .unwrap()
-        .try_collect()
-        .await
-        .unwrap();
-
     return result;
-}
-
-async fn get_reststops_collection() -> Collection<Reststop> {
-    let connection_string = env::var("MONGO_CONNECTION_STRING").unwrap();
-
-    let opts = ClientOptions::parse(connection_string).await.unwrap();
-    let client = Client::with_options(opts).unwrap();
-
-    let db = client.database("reststops");
-    let reststops_col = db.collection::<Reststop>("reststops");
-    return reststops_col;
 }
 
 pub struct CORS;
