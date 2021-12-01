@@ -81,11 +81,11 @@ pub struct Source {
     pub location: Vec<f64>,
 }
 
-pub struct Osrm {}
+pub struct Mapbox {}
 
-impl Osrm {
+impl Mapbox {
     pub async fn route(coordinates: Vec<Coordinate<f64>>) -> Result<LineString<f64>> {
-        let url = Osrm::build_url(coordinates, "directions/v5");
+        let url = Mapbox::build_url(coordinates, "directions/v5");
         let route_result = reqwest::get(url).await?.json::<RouteResult>().await?;
 
         let polyline = polyline::decode_polyline(&route_result.routes[0].geometry, 5).unwrap();
@@ -94,7 +94,7 @@ impl Osrm {
     }
 
     pub async fn table(coordinates: Vec<Coordinate<f64>>) -> Result<Vec<Vec<f64>>> {
-        let url = Osrm::build_url(coordinates, "directions-matrix/v1");
+        let url = Mapbox::build_url(coordinates, "directions-matrix/v1");
         let table_result = reqwest::get(url).await?.json::<TableResult>().await?;
 
         Ok(table_result.durations)

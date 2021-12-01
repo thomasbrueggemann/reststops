@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 
 use anyhow::Result;
-use geo::{prelude::Centroid, LineString, Point, Polygon};
 use mongodb::bson::DateTime;
 use serde::{Deserialize, Serialize};
 
@@ -22,8 +21,15 @@ pub struct Osm3s {
     #[serde(rename = "timestamp_osm_base")]
     pub timestamp_osm_base: String,
     #[serde(rename = "timestamp_areas_base")]
-    pub timestamp_areas_base: String,
+    pub timestamp_areas_base: Option<String>,
     pub copyright: String,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Center {
+    pub lat: f64,
+    pub lon: f64,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -37,19 +43,20 @@ pub struct Element {
     pub tags: Option<HashMap<String, String>>,
     pub lat: Option<f64>,
     pub lon: Option<f64>,
+    pub center: Option<Center>,
 }
 
 pub struct Overpass {}
 
 impl Overpass {
     pub async fn query(
-        lon_west: f64,
-        lat_north: f64,
-        lon_east: f64,
-        lat_south: f64,
+        min_lat: f64,
+        min_lon: f64,
+        max_lat: f64,
+        max_lon: f64,
     ) -> Result<Vec<Reststop>> {
-        let query_bbox = format!("{},{},{},{}", lon_west, lat_north, lon_east, lat_south);
-        let query = format!("[out:json][timeout:250];(way[\"highway\"=\"rest_area\"]({bbox}); node[\"highway\"=\"rest_area\"]({bbox}););out body;", bbox = query_bbox);
+        let query_bbox = format!("{},{},{},{}", min_lat, min_lon, max_lat, max_lon);
+        let query = format!("[out:json][timeout:250];(way[\"highway\"=\"rest_area\"]({bbox}); node[\"highway\"=\"rest_area\"]({bbox});way[\"highway\"=\"services\"]({bbox}); node[\"highway\"=\"services\"]({bbox}););out center;", bbox = query_bbox);
         let params = [("data", query)];
 
         let client = reqwest::Client::new();
@@ -61,15 +68,8 @@ impl Overpass {
             .json::<OverpassResult>()
             .await?;
 
-        let elements: Vec<Element> = result.elements;
-
-        let way_nodes: HashMap<i64, &Element> = elements
-            .iter()
-            .filter(|element| element.type_field.eq("node") && element.tags.is_none())
-            .map(|element| (element.id, element))
-            .collect();
-
-        let reststops: Vec<Reststop> = elements
+        let reststops: Vec<Reststop> = result
+            .elements
             .iter()
             .filter(|element| element.tags.is_some())
             .map(|element| {
@@ -83,20 +83,8 @@ impl Overpass {
                 let coords: Vec<f64> = if element.nodes.len() == 0 {
                     vec![element.lon.unwrap(), element.lat.unwrap()]
                 } else {
-                    let points: Vec<Point<f64>> = element
-                        .nodes
-                        .iter()
-                        .map(|node_id| {
-                            let node = &way_nodes[node_id];
-                            Point::new(node.lon.unwrap(), node.lat.unwrap())
-                        })
-                        .collect();
-
-                    let centroid: Point<f64> = Polygon::new(LineString::from(points), vec![])
-                        .centroid()
-                        .unwrap();
-
-                    vec![centroid.x(), centroid.y()]
+                    let center = element.center.as_ref().unwrap();
+                    vec![center.lon, center.lat]
                 };
 
                 let location = Location {

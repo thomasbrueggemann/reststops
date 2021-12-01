@@ -11,3 +11,4 @@ docker-compose.yml
 target/**
 *.osm.pbf
 dev.env
+.vscode/

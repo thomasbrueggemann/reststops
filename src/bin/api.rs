@@ -3,7 +3,7 @@ extern crate rocket;
 
 use ::reststops::buffer::Buffer;
 use ::reststops::circle::Circle;
-use ::reststops::osrm::Osrm;
+use ::reststops::mapbox::Mapbox;
 use ::reststops::overpass::Overpass;
 use ::reststops::reststop::{Reststop, ReststopCategory};
 use geo::algorithm::bounding_rect::BoundingRect;
@@ -27,7 +27,7 @@ struct ReststopResponse {
     pub category: ReststopCategory,
     pub location: Vec<f64>,
     pub tags: HashMap<String, String>,
-    pub detour_seconds: f64,
+    pub detour_seconds: i32,
 }
 
 impl ReststopResponse {
@@ -38,7 +38,7 @@ impl ReststopResponse {
             category: reststop.category,
             location: reststop.location.coordinates.to_owned(),
             tags: reststop.tags.to_owned(),
-            detour_seconds,
+            detour_seconds: detour_seconds as i32,
         }
     }
 }
@@ -54,7 +54,7 @@ async fn reststops(
     start_lat: f64,
     end_lon: f64,
     end_lat: f64,
-    max_detour_seconds: f64,
+    max_detour_seconds: i32,
 ) -> Json<Vec<ReststopResponse>> {
     let start = Coordinate {
         x: start_lon,
@@ -66,7 +66,7 @@ async fn reststops(
         y: end_lat,
     };
 
-    let route = Osrm::route(vec![start, end]).await.unwrap();
+    let route = Mapbox::route(vec![start, end]).await.unwrap();
     let mut reststops = get_reststops(route, start).await;
 
     let closest_reststops = filter_closest_reststops(&mut reststops, Point::from(start));
@@ -131,7 +131,7 @@ async fn get_duration_table(
     distance_coords.append(&mut reststop_coords);
     distance_coords.push(end);
 
-    let table = Osrm::table(distance_coords).await.unwrap();
+    let table = Mapbox::table(distance_coords).await.unwrap();
 
     return table;
 }
@@ -146,10 +146,10 @@ async fn get_reststops(route: LineString<f64>, start: Coordinate<f64>) -> Vec<Re
     let sector_bbox = sector.bounding_rect().unwrap();
 
     let overpass_reststops = Overpass::query(
+        sector_bbox.min().y,
         sector_bbox.min().x,
         sector_bbox.max().y,
         sector_bbox.max().x,
-        sector_bbox.min().y,
     )
     .await
     .unwrap();
