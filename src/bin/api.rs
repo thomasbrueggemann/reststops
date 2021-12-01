@@ -85,6 +85,10 @@ async fn reststops(
 }
 
 fn filter_closest_reststops(reststops: &mut Vec<Reststop>, start: Point<f64>) -> Vec<&Reststop> {
+    if reststops.len() <= 23 {
+        return reststops;
+    }
+
     reststops.sort_by(|a, b| {
         let distance_a = start.haversine_distance(&a.to_point());
         let distance_b = start.haversine_distance(&b.to_point());
@@ -142,7 +146,6 @@ async fn get_reststops(route: LineString<f64>, start: Coordinate<f64>) -> Vec<Re
 
     let sectors = buffered_route.intersection(&circle_around_start, 1000.);
     let sector: Polygon<f64> = sectors.into_iter().next().unwrap();
-
     let sector_bbox = sector.bounding_rect().unwrap();
 
     let overpass_reststops = Overpass::query(
@@ -154,12 +157,12 @@ async fn get_reststops(route: LineString<f64>, start: Coordinate<f64>) -> Vec<Re
     .await
     .unwrap();
 
-    let result: Vec<Reststop> = overpass_reststops
+    let sector_reststops: Vec<Reststop> = overpass_reststops
         .into_iter()
         .filter(|reststop| sector.contains(&reststop.to_coordinate()))
         .collect();
 
-    return result;
+    return sector_reststops;
 }
 
 pub struct CORS;
