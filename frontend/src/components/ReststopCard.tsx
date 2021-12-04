@@ -5,20 +5,23 @@ import {
   IonCardTitle,
   IonCardContent,
 } from "@ionic/react";
+import { Reststop } from "../models/Reststop";
 
-const ReststopCard: React.FC = () => {
+export interface ReststopCardProps {
+  reststop: Reststop;
+}
+
+const ReststopCard: React.FC<ReststopCardProps> = (props) => {
   return (
     <IonCard>
       <IonCardHeader>
-        <IonCardSubtitle>Card Subtitle</IonCardSubtitle>
-        <IonCardTitle>Card Title</IonCardTitle>
+        <IonCardSubtitle>
+          {props.reststop.category === "rest_area" ? "Reststop" : "Gas-Station"}
+        </IonCardSubtitle>
+        <IonCardTitle>{props.reststop.name}</IonCardTitle>
       </IonCardHeader>
 
-      <IonCardContent>
-        Keep close to Nature's heart... and break clear away, once in awhile,
-        and climb a mountain or spend a week in the woods. Wash your spirit
-        clean.
-      </IonCardContent>
+      <IonCardContent>{props.reststop.description}</IonCardContent>
     </IonCard>
   );
 };
