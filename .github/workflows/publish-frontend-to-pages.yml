@@ -27,9 +27,10 @@ jobs:
           restore-keys: npm-
           
       - name: Install and Build 🔧
-        run: cd frontend
-        run: npm install
-        run: npm run build
+        run: |
+          cd frontend
+          npm install
+          npm run build
       
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@4.1.7
