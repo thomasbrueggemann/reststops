@@ -4,9 +4,6 @@ import App from "./App";
 import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
 import reportWebVitals from "./reportWebVitals";
 
-const cfg = require("dotenv").config();
-console.log(cfg);
-
 ReactDOM.render(
   <React.StrictMode>
     <App />

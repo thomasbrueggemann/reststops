@@ -20,9 +20,9 @@ export interface MapProps {
 
 const Map: React.FC<MapProps> = (props) => {
   const [viewport, setViewport] = useState({
-    latitude: 37.7577,
-    longitude: -122.4376,
-    zoom: 8,
+    latitude: 50.7577,
+    longitude: -13.4376,
+    zoom: 3,
     transitionDuration: 5000,
     transitionInterpolator: new FlyToInterpolator(),
   });
