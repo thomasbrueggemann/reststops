@@ -85,17 +85,14 @@ async fn reststops(
 }
 
 fn filter_closest_reststops(reststops: &mut Vec<Reststop>, start: Point<f64>) -> Vec<&Reststop> {
-    if reststops.len() <= 23 {
-        return reststops;
+    if reststops.len() > 23 {
+        reststops.sort_by(|a, b| {
+            let distance_a = start.haversine_distance(&a.to_point());
+            let distance_b = start.haversine_distance(&b.to_point());
+
+            distance_a.partial_cmp(&distance_b).unwrap()
+        });
     }
-
-    reststops.sort_by(|a, b| {
-        let distance_a = start.haversine_distance(&a.to_point());
-        let distance_b = start.haversine_distance(&b.to_point());
-
-        distance_a.partial_cmp(&distance_b).unwrap()
-    });
-
     reststops.iter().take(23).collect()
 }
 
