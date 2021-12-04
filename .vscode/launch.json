@@ -1,0 +1,67 @@
+{
+	// Use IntelliSense to learn about possible attributes.
+	// Hover to view descriptions of existing attributes.
+	// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"type": "lldb",
+			"request": "launch",
+			"name": "Debug unit tests in library 'reststops'",
+			"cargo": {
+				"args": [
+					"test",
+					"--no-run",
+					"--lib",
+					"--package=reststops"
+				],
+				"filter": {
+					"name": "reststops",
+					"kind": "lib"
+				}
+			},
+			"args": [],
+			"cwd": "${workspaceFolder}"
+		},
+		{
+			"type": "lldb",
+			"request": "launch",
+			"name": "Debug executable 'api'",
+			"cargo": {
+				"args": [
+					"build",
+					"--bin=api",
+					"--package=reststops"
+				],
+				"filter": {
+					"name": "api",
+					"kind": "bin"
+				}
+			},
+			"args": [],
+			"cwd": "${workspaceFolder}",
+			"env": {
+				"MAPBOX_API_TOKEN": "pk.eyJ1IjoiYmx1ZWdnZW1hbm4iLCJhIjoiY2tiZW1xMGloMG40cjJzbm9jZDB2NGxwdyJ9.GEBzqnPxTpcFo7HLC8EzRQ"
+			}
+		},
+		{
+			"type": "lldb",
+			"request": "launch",
+			"name": "Debug unit tests in executable 'api'",
+			"cargo": {
+				"args": [
+					"test",
+					"--no-run",
+					"--bin=api",
+					"--package=reststops"
+				],
+				"filter": {
+					"name": "api",
+					"kind": "bin"
+				}
+			},
+			"args": [],
+			"cwd": "${workspaceFolder}"
+		}
+	]
+}
