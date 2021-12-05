@@ -8,8 +8,9 @@ use ::reststops::overpass::Overpass;
 use ::reststops::reststop::{Reststop, ReststopCategory};
 use geo::algorithm::bounding_rect::BoundingRect;
 use geo::prelude::{Contains, HaversineDistance};
-use geo::{Coordinate, LineString, Point, Polygon};
+use geo::{Coordinate, Point, Polygon, Rect};
 use geo_clipper::Clipper;
+use polyline;
 use rocket::fairing::{Fairing, Info, Kind};
 use rocket::http::Header;
 use rocket::serde::json::Json;
@@ -28,6 +29,14 @@ struct ReststopResponse {
     pub location: Vec<f64>,
     pub tags: HashMap<String, String>,
     pub detour_seconds: i32,
+}
+
+#[derive(Serialize)]
+#[serde(crate = "rocket::serde")]
+struct ReststopsResponse {
+    reststops: Vec<ReststopResponse>,
+    route: String,
+    bbox: Vec<f64>,
 }
 
 impl ReststopResponse {
@@ -55,7 +64,7 @@ async fn reststops(
     end_lon: f64,
     end_lat: f64,
     max_detour_seconds: i32,
-) -> Json<Vec<ReststopResponse>> {
+) -> Json<ReststopsResponse> {
     let start = Coordinate {
         x: start_lon,
         y: start_lat,
@@ -67,12 +76,31 @@ async fn reststops(
     };
 
     let route = Mapbox::route(vec![start, end]).await.unwrap();
-    let mut reststops = get_reststops(route, start).await;
+    let buffered_route = route.buffer(0.03);
+    let circle_around_start = Polygon::circle(start, 50_000, 5);
+
+    let sectors = buffered_route.intersection(&circle_around_start, 1000.);
+    let sector: Polygon<f64> = sectors.into_iter().next().unwrap();
+    let sector_bbox = sector.bounding_rect().unwrap();
+
+    let mut reststops = get_reststops(sector, sector_bbox).await;
 
     let closest_reststops = filter_closest_reststops(&mut reststops, Point::from(start));
 
+    let response_polyline = polyline::encode_coordinates(route, 5).unwrap();
+    let response_bbox = vec![
+        sector_bbox.min().x,
+        sector_bbox.min().y,
+        sector_bbox.max().x,
+        sector_bbox.max().y,
+    ];
+
     if closest_reststops.len() == 0 {
-        return Json(vec![]);
+        return Json(ReststopsResponse {
+            reststops: vec![],
+            route: response_polyline,
+            bbox: response_bbox,
+        });
     }
 
     let durations = get_duration_table(start, end, &closest_reststops).await;
@@ -81,7 +109,11 @@ async fn reststops(
         .filter(|response| response.detour_seconds <= max_detour_seconds)
         .collect::<Vec<ReststopResponse>>();
 
-    Json(responses)
+    Json(ReststopsResponse {
+        reststops: responses,
+        route: response_polyline,
+        bbox: response_bbox,
+    })
 }
 
 fn filter_closest_reststops(reststops: &mut Vec<Reststop>, start: Point<f64>) -> Vec<&Reststop> {
@@ -137,14 +169,7 @@ async fn get_duration_table(
     return table;
 }
 
-async fn get_reststops(route: LineString<f64>, start: Coordinate<f64>) -> Vec<Reststop> {
-    let buffered_route = route.buffer(0.03);
-    let circle_around_start = Polygon::circle(start, 50_000, 5);
-
-    let sectors = buffered_route.intersection(&circle_around_start, 1000.);
-    let sector: Polygon<f64> = sectors.into_iter().next().unwrap();
-    let sector_bbox = sector.bounding_rect().unwrap();
-
+async fn get_reststops(sector: Polygon<f64>, sector_bbox: Rect<f64>) -> Vec<Reststop> {
     let overpass_reststops = Overpass::query(
         sector_bbox.min().y,
         sector_bbox.min().x,

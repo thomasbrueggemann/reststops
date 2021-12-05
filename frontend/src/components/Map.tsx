@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import ReactMapGL, {
   FlyToInterpolator,
   GeolocateControl,
   Marker,
-  WebMercatorViewport,
 } from "react-map-gl";
 import { Reststop } from "../models/Reststop";
+import Pin from "./Pin";
 
 const geolocateStyle = {
   top: 0,
@@ -63,7 +63,9 @@ const Map: React.FC<MapProps> = (props) => {
             latitude={reststop.location[1]}
             offsetTop={-20}
             offsetLeft={-10}
-          ></Marker>
+          >
+            <Pin size={20} />
+          </Marker>
         );
       })}
     </ReactMapGL>
