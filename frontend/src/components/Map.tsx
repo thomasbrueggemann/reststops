@@ -42,7 +42,7 @@ const Map: React.FC<MapProps> = (props) => {
   return (
     <ReactMapGL
       {...viewport}
-      mapboxApiAccessToken="pk.eyJ1IjoiYmx1ZWdnZW1hbm4iLCJhIjoiY2tiZW1xMGloMG40cjJzbm9jZDB2NGxwdyJ9.GEBzqnPxTpcFo7HLC8EzRQ"
+      mapboxApiAccessToken="pk.eyJ1IjoiYmx1ZWdnZW1hbm4iLCJhIjoiY2t3dDFjeG54MDRrYTJxbWl4ZmZkMmR2YyJ9.qJKTee6lqjpS3fs3YqynWw"
       width="100%"
       height="300px"
       mapStyle="mapbox://styles/mapbox/dark-v9"
