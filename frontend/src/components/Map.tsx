@@ -55,9 +55,10 @@ const Map: React.FC<MapProps> = (props) => {
         auto
       />
 
-      {props.reststops.map((reststop) => {
+      {props.reststops.map((reststop, i) => {
         return (
           <Marker
+            key={i}
             longitude={reststop.location[0]}
             latitude={reststop.location[1]}
             offsetTop={-20}
