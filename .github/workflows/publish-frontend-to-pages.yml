@@ -31,6 +31,8 @@ jobs:
           cd frontend
           npm install
           npm run build
+        env:
+          PUBLIC_URL: https://thomasbrueggemann.github.io/reststops/
       
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@4.1.7
