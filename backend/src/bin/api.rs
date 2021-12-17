@@ -3,9 +3,9 @@ extern crate rocket;
 
 use ::reststops::buffer::Buffer;
 use ::reststops::circle::Circle;
-use ::reststops::mapbox::Mapbox;
 use ::reststops::overpass::Overpass;
 use ::reststops::reststop::{Reststop, ReststopCategory};
+use ::reststops::routing::Routing;
 use geo::algorithm::bounding_rect::BoundingRect;
 use geo::prelude::{Contains, HaversineDistance};
 use geo::{Coordinate, Point, Polygon, Rect};
@@ -75,7 +75,7 @@ async fn reststops(
         y: end_lat,
     };
 
-    let route = Mapbox::route(vec![start, end]).await.unwrap();
+    let route = Routing::route(vec![start, end]).await.unwrap();
     let buffered_route = route.buffer(0.03);
     let circle_around_start = Polygon::circle(start, 50_000, 5);
 
@@ -164,7 +164,7 @@ async fn get_duration_table(
     distance_coords.append(&mut reststop_coords);
     distance_coords.push(end);
 
-    let table = Mapbox::table(distance_coords).await.unwrap();
+    let table = Routing::table(distance_coords).await.unwrap();
 
     return table;
 }

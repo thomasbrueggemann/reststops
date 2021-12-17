@@ -5,7 +5,7 @@ const IconPath: string = `M20.2,15.7L20.2,15.7c1.1-1.6,1.8-3.6,1.8-5.7c0-5.6-4.5
   C20.1,15.8,20.2,15.8,20.2,15.7z`;
 
 const pinStyle: React.CSSProperties = {
-  fill: "#d00",
+  fill: "#bf616a",
   stroke: "none",
 };
 

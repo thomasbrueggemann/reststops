@@ -1,9 +1,6 @@
 import {
-  IonButton,
-  IonButtons,
   IonContent,
   IonHeader,
-  IonIcon,
   IonPage,
   IonProgressBar,
   IonSearchbar,
@@ -15,32 +12,66 @@ import Map from "../components/Map";
 import ReststopCard from "../components/ReststopCard";
 import { Reststop } from "../models/Reststop";
 import "./Home.css";
+import Autocomplete from "../components/Autocomplete";
+import { Geometry } from "../models/GeocodingResult";
+import useGeoLocation from "../hooks/useLocation";
+
+interface ReststopsResponse {
+  reststops: Reststop[];
+  route: string;
+  bbox: number[];
+}
 
 const Home: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [reststops, setReststops] = useState<Reststop[]>([]);
+  const [route, setRoute] = useState<string | null>(null);
+  const [bbox, setBbox] = useState<number[]>([]);
+  const [searchText, setSearchText] = useState<string | null>(null);
+  const [destination, setDestination] = useState<Geometry | null>(null);
+  const geolocation = useGeoLocation();
 
-  const loadReststops = async () => {
+  const loadReststops = async (
+    geolocation: GeolocationPosition | null,
+    destination: Geometry | null
+  ) => {
+    if (destination === null || geolocation === null) {
+      return;
+    }
+
     setLoading(true);
+    const host = "https://reststops.thomasbrueggemann.com";
     const response = await fetch(
-      "https://reststops.thomasbrueggemann.com/reststops?start_lon=10.747957727309794&start_lat=53.79213882642322&end_lon=12.196588369284084&end_lat=54.059900105961155&max_detour_seconds=400"
+      `${host}/reststops?start_lon=${geolocation.coords.longitude}&start_lat=${geolocation.coords.latitude}` +
+        `&end_lon=${destination.coordinates[0]}&end_lat=${destination.coordinates[1]}&max_detour_seconds=400`
     );
 
-    const result: Reststop[] = await response.json();
+    const result: ReststopsResponse = await response.json();
 
     setLoading(false);
-    setReststops(result);
+
+    setReststops(result.reststops);
+    setRoute(result.route);
+    setBbox(result.bbox);
   };
 
   useEffect(() => {
-    loadReststops();
-  }, []);
+    loadReststops(geolocation, destination);
+  }, [geolocation, destination]);
 
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonSearchbar placeholder="What's your destination?" />
+          <IonSearchbar
+            placeholder="What's your destination?"
+            onIonChange={(e) => {
+              setSearchText(e.detail.value!);
+              setReststops([]);
+              setRoute(null);
+              setBbox([]);
+            }}
+          />
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
@@ -49,7 +80,26 @@ const Home: React.FC = () => {
             <IonTitle size="large">Reststops</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <Map reststops={reststops} />
+
+        {!loading && reststops.length === 0 && searchText === null && (
+          <div>Please select a destination</div>
+        )}
+
+        {!loading &&
+          reststops.length === 0 &&
+          searchText !== null &&
+          searchText.length >= 3 && (
+            <Autocomplete
+              destination={searchText}
+              onDestinationSelected={(destination) =>
+                setDestination(destination)
+              }
+            />
+          )}
+
+        {reststops.length > 0 && (
+          <Map reststops={reststops} route={route} bbox={bbox} />
+        )}
 
         {loading && <IonProgressBar type="indeterminate"></IonProgressBar>}
 

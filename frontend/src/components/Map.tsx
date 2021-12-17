@@ -1,21 +1,26 @@
-import React, { useState } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useEffect, useState } from "react";
 import ReactMapGL, {
   FlyToInterpolator,
-  GeolocateControl,
+  Layer,
+  LayerProps,
   Marker,
+  Source,
+  WebMercatorViewport,
 } from "react-map-gl";
 import { Reststop } from "../models/Reststop";
 import Pin from "./Pin";
+import polyline from "@mapbox/polyline";
+import { WebMercatorViewportOptions } from "@math.gl/web-mercator/src/web-mercator-viewport";
+import { constants } from "buffer";
+import { MAPBOX_TOKEN } from "../constants";
 
-const geolocateStyle = {
-  top: 0,
-  left: 0,
-  margin: 10,
-};
-const positionOptions = { enableHighAccuracy: true };
+const mapHeight: number = 300;
 
 export interface MapProps {
   reststops: Reststop[];
+  route: string | null;
+  bbox: number[];
 }
 
 const Map: React.FC<MapProps> = (props) => {
@@ -23,37 +28,75 @@ const Map: React.FC<MapProps> = (props) => {
     latitude: 50.7577,
     longitude: -13.4376,
     zoom: 3,
-    transitionDuration: 5000,
+    transitionDuration: 1111,
     transitionInterpolator: new FlyToInterpolator(),
   });
 
-  /*useEffect(() => {
-    const { longitude, latitude, zoom } = new WebMercatorViewport(
-      viewport
-    ).fitBounds(
-      props.reststops.map((r) => [r.location[0], r.location]),
-      {
-        padding: 20,
-        offset: [0, -100],
-      }
-    );
-  }, [props.reststops, viewport]);*/
+  useEffect(() => {
+    if (props.bbox.length > 0) {
+      const mercatorViewportOptions: WebMercatorViewportOptions = {
+        width: window.innerWidth,
+        height: mapHeight,
+        latitude: viewport.latitude,
+        longitude: viewport.longitude,
+        zoom: viewport.zoom,
+      };
+
+      const newViewport = new WebMercatorViewport(
+        mercatorViewportOptions
+      ).fitBounds([
+        [props.bbox[0], props.bbox[1]],
+        [props.bbox[2], props.bbox[3]],
+      ]);
+
+      setViewport({
+        ...viewport,
+        ...newViewport,
+      });
+    }
+  }, [props.bbox]);
+
+  const layerStyle: LayerProps = {
+    type: "line",
+    paint: {
+      "line-width": 3,
+      "line-color": "#ebcb8b",
+      "line-opacity": 0.65,
+    },
+  };
 
   return (
     <ReactMapGL
       {...viewport}
-      mapboxApiAccessToken="pk.eyJ1IjoiYmx1ZWdnZW1hbm4iLCJhIjoiY2t3dDFjeG54MDRrYTJxbWl4ZmZkMmR2YyJ9.qJKTee6lqjpS3fs3YqynWw"
+      mapboxApiAccessToken={MAPBOX_TOKEN}
       width="100%"
-      height="300px"
+      height={mapHeight + "px"}
       mapStyle="mapbox://styles/mapbox/dark-v9"
       onViewportChange={(viewport: any) => setViewport(viewport)}
     >
-      <GeolocateControl
-        style={geolocateStyle}
-        positionOptions={positionOptions}
-        trackUserLocation
-        auto
-      />
+      {props.route && (
+        <Source
+          id="route"
+          type="geojson"
+          data={{
+            type: "FeatureCollection",
+            features: [
+              {
+                type: "Feature",
+                properties: {},
+                geometry: {
+                  type: "LineString",
+                  coordinates: polyline
+                    .decode(props.route, 5)
+                    .map((coord) => coord.reverse()),
+                },
+              },
+            ],
+          }}
+        >
+          <Layer {...layerStyle} />
+        </Source>
+      )}
 
       {props.reststops.map((reststop, i) => {
         return (
