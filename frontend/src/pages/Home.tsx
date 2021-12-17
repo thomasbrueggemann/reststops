@@ -98,7 +98,12 @@ const Home: React.FC = () => {
           )}
 
         {reststops.length > 0 && (
-          <Map reststops={reststops} route={route} bbox={bbox} />
+          <Map
+            reststops={reststops}
+            route={route}
+            bbox={bbox}
+            currentLocation={geolocation}
+          />
         )}
 
         {loading && <IonProgressBar type="indeterminate"></IonProgressBar>}

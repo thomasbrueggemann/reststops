@@ -12,8 +12,8 @@ import { Reststop } from "../models/Reststop";
 import Pin from "./Pin";
 import polyline from "@mapbox/polyline";
 import { WebMercatorViewportOptions } from "@math.gl/web-mercator/src/web-mercator-viewport";
-import { constants } from "buffer";
 import { MAPBOX_TOKEN } from "../constants";
+import CurrentLocation from "./CurrentLocation";
 
 const mapHeight: number = 300;
 
@@ -21,6 +21,7 @@ export interface MapProps {
   reststops: Reststop[];
   route: string | null;
   bbox: number[];
+  currentLocation: GeolocationPosition | null;
 }
 
 const Map: React.FC<MapProps> = (props) => {
@@ -59,9 +60,12 @@ const Map: React.FC<MapProps> = (props) => {
   const layerStyle: LayerProps = {
     type: "line",
     paint: {
-      "line-width": 3,
+      "line-width": 5,
       "line-color": "#ebcb8b",
       "line-opacity": 0.65,
+    },
+    layout: {
+      "line-join": "round",
     },
   };
 
@@ -96,6 +100,13 @@ const Map: React.FC<MapProps> = (props) => {
         >
           <Layer {...layerStyle} />
         </Source>
+      )}
+
+      {props.currentLocation && (
+        <CurrentLocation
+          longitude={props.currentLocation.coords.longitude}
+          latitude={props.currentLocation.coords.latitude}
+        />
       )}
 
       {props.reststops.map((reststop, i) => {

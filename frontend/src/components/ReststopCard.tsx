@@ -6,6 +6,8 @@ import {
   IonCardContent,
 } from "@ionic/react";
 import { Reststop } from "../models/Reststop";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faRestroom, faGasPump } from "@fortawesome/free-solid-svg-icons";
 
 export interface ReststopCardProps {
   reststop: Reststop;
@@ -21,7 +23,11 @@ const ReststopCard: React.FC<ReststopCardProps> = (props) => {
         <IonCardTitle>{props.reststop.name}</IonCardTitle>
       </IonCardHeader>
 
-      <IonCardContent>{props.reststop.description}</IonCardContent>
+      <IonCardContent>
+        {props.reststop.description}
+        <FontAwesomeIcon size="2x" fixedWidth icon={faRestroom} />
+        <FontAwesomeIcon size="2x" fixedWidth icon={faGasPump} />
+      </IonCardContent>
     </IonCard>
   );
 };
