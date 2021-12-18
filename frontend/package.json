@@ -11,8 +11,8 @@
     "@fortawesome/fontawesome-svg-core": "^1.2.36",
     "@fortawesome/free-solid-svg-icons": "^5.15.4",
     "@fortawesome/react-fontawesome": "^0.1.16",
-    "@ionic/react": "^5.5.0",
-    "@ionic/react-router": "^5.5.0",
+    "@ionic/react": "^6.0.1",
+    "@ionic/react-router": "^6.0.1",
     "@mapbox/polyline": "^1.1.1",
     "@testing-library/jest-dom": "^5.11.9",
     "@testing-library/react": "^11.2.5",
@@ -23,7 +23,7 @@
     "@types/react-dom": "^16.9.10",
     "@types/react-router": "^5.1.11",
     "@types/react-router-dom": "^5.1.7",
-    "ionicons": "^5.4.0",
+    "ionicons": "^6.0.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-map-gl": "^6.1.17",
@@ -50,7 +50,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "react-scripts test --transformIgnorePatterns 'node_modules/(?!(@ionic/react|@ionic/react-router|@ionic/core|@stencil/core|ionicons)/)'",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {

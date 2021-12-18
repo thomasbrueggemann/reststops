@@ -11,24 +11,34 @@ export interface AutocompleteProps {
 const Autocomplete: React.FC<AutocompleteProps> = (props) => {
   const [features, setFeatures] = useState<Feature[]>([]);
 
-  const getGeocodingResults = async (searchText: string) => {
-    if (searchText && searchText.length < 3) {
-      return;
-    }
-
-    const baseUrl = "https://api.mapbox.com/geocoding/v5/mapbox.places";
-    const response = await fetch(
-      `${baseUrl}/${encodeURIComponent(
-        searchText
-      )}.json?autocomplete=true&fuzzyMatch=true&access_token=${MAPBOX_TOKEN}`
-    );
-
-    const result: GeocodingResult = await response.json();
-    setFeatures(result.features);
-  };
-
   useEffect(() => {
+    const abortController = new AbortController();
+
+    const getGeocodingResults = async (searchText: string) => {
+      if (searchText && searchText.length < 3) {
+        return;
+      }
+
+      const baseUrl = "https://api.mapbox.com/geocoding/v5/mapbox.places";
+
+      try {
+        const response = await fetch(
+          `${baseUrl}/${encodeURIComponent(
+            searchText
+          )}.json?autocomplete=true&fuzzyMatch=true&access_token=${MAPBOX_TOKEN}`,
+          { signal: abortController.signal }
+        );
+
+        const result: GeocodingResult = await response.json();
+        setFeatures(result.features);
+      } catch {}
+    };
+
     getGeocodingResults(props.destination);
+
+    return () => {
+      abortController.abort();
+    };
   }, [props.destination]);
 
   return (

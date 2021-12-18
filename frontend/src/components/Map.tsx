@@ -125,7 +125,7 @@ const Map: React.FC<MapProps> = (props) => {
             offsetTop={-20}
             offsetLeft={-10}
           >
-            <Pin size={20} />
+            <Pin size={30} numbering={i + 1} />
           </Marker>
         );
       })}

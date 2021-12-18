@@ -6,19 +6,24 @@ const IconPath: string = `M20.2,15.7L20.2,15.7c1.1-1.6,1.8-3.6,1.8-5.7c0-5.6-4.5
 
 const pinStyle: React.CSSProperties = {
   fill: "#bf616a",
-  stroke: "none",
+  strokeWidth: 1,
+  stroke: "#d8dee9",
 };
 
 export interface PinProps {
   size: number;
+  numbering: number;
 }
 
 const Pin: React.FC<PinProps> = (props) => {
-  const { size = 20 } = props;
+  const { size = 20, numbering } = props;
 
   return (
-    <svg height={size} viewBox="0 0 24 24" style={pinStyle}>
+    <svg height={size} viewBox="-1 -1 25 25" style={pinStyle}>
       <path d={IconPath} />
+      <text x="8" y="16" fill="white" fontSize={15}>
+        {numbering}
+      </text>
     </svg>
   );
 };

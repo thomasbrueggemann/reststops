@@ -4,7 +4,6 @@ import {
   IonPage,
   IonProgressBar,
   IonSearchbar,
-  IonTitle,
   IonToolbar,
 } from "@ionic/react";
 import { useEffect, useState } from "react";
@@ -75,14 +74,10 @@ const Home: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
-        <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="large">Reststops</IonTitle>
-          </IonToolbar>
-        </IonHeader>
-
         {!loading && reststops.length === 0 && searchText === null && (
-          <div>Please select a destination</div>
+          <div style={{ textAlign: "center", marginTop: "40px" }}>
+            🚏 Please find a destination
+          </div>
         )}
 
         {!loading &&
@@ -109,7 +104,7 @@ const Home: React.FC = () => {
         {loading && <IonProgressBar type="indeterminate"></IonProgressBar>}
 
         {reststops.map((reststop, i) => (
-          <ReststopCard key={i} reststop={reststop} />
+          <ReststopCard key={i} numbering={i + 1} reststop={reststop} />
         ))}
       </IonContent>
     </IonPage>

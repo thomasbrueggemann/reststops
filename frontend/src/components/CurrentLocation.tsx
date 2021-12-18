@@ -4,11 +4,11 @@ import { Layer, LayerProps, Source } from "react-map-gl";
 const layerStyle: LayerProps = {
   type: "circle",
   paint: {
-    "circle-radius": 8,
+    "circle-radius": 7,
     "circle-color": "#88c0d0",
     "circle-opacity": 1,
-    "circle-stroke-color": "#fff",
-    "circle-stroke-width": 1,
+    "circle-stroke-color": "#d8dee9",
+    "circle-stroke-width": 2,
   },
 };
 
