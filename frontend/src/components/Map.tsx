@@ -15,6 +15,13 @@ import { WebMercatorViewportOptions } from "@math.gl/web-mercator/src/web-mercat
 import { MAPBOX_TOKEN } from "../constants";
 import CurrentLocation from "./CurrentLocation";
 
+import mapboxgl from "mapbox-gl"; // This is a dependency of react-map-gl even if you didn't explicitly install it
+
+// @ts-ignore
+mapboxgl.workerClass =
+  // eslint-disable-next-line import/no-webpack-loader-syntax
+  require("worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker").default;
+
 const mapHeight: number = 300;
 
 export interface MapProps {
