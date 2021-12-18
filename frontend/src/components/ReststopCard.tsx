@@ -48,12 +48,15 @@ const ReststopCard: React.FC<ReststopCardProps> = (props) => {
 
   return (
     <IonCard>
-      <IonGrid>
-        <IonRow class="ion-justify-content-between">
+      <IonGrid style={{ margin: 0, padding: 0 }}>
+        <IonRow
+          class="ion-justify-content-between"
+          style={{ margin: 0, padding: 0 }}
+        >
           <IonCol className="ion-align-self-center" size="1">
             <Pin size={40} numbering={props.numbering} />
           </IonCol>
-          <IonCol>
+          <IonCol style={{ margin: 0, padding: 0 }}>
             <IonCardHeader>
               <IonCardSubtitle>
                 <b style={{ color: detourColor }}>+{detour} min</b>
