@@ -3,8 +3,11 @@ import {
   IonHeader,
   IonPage,
   IonProgressBar,
+  IonRefresher,
+  IonRefresherContent,
   IonSearchbar,
   IonToolbar,
+  RefresherEventDetail,
 } from "@ionic/react";
 import { useEffect, useState } from "react";
 import Map from "../components/Map";
@@ -14,6 +17,7 @@ import "./Home.css";
 import Autocomplete from "../components/Autocomplete";
 import { Geometry } from "../models/GeocodingResult";
 import useGeoLocation from "../hooks/useLocation";
+import useLocalStorage from "../hooks/useLocalStorage";
 
 interface ReststopsResponse {
   reststops: Reststop[];
@@ -27,7 +31,7 @@ const Home: React.FC = () => {
   const [route, setRoute] = useState<string | null>(null);
   const [bbox, setBbox] = useState<number[]>([]);
   const [searchText, setSearchText] = useState<string | null>(null);
-  const [destination, setDestination] = useState<Geometry | null>(null);
+  const [destination, setDestination] = useLocalStorage("destination", null);
   const geolocation = useGeoLocation();
 
   const loadReststops = async (
@@ -57,6 +61,11 @@ const Home: React.FC = () => {
   useEffect(() => {
     loadReststops(geolocation, destination);
   }, [geolocation, destination]);
+
+  const handleRefresh = (event: CustomEvent<RefresherEventDetail>) => {
+    loadReststops(geolocation, destination);
+    event.detail.complete();
+  };
 
   return (
     <IonPage>
@@ -91,6 +100,10 @@ const Home: React.FC = () => {
               }
             />
           )}
+
+        <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
+          <IonRefresherContent></IonRefresherContent>
+        </IonRefresher>
 
         {reststops.length > 0 && (
           <Map
