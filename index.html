@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Rest Stop Finder</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0f0f1a;
+      --surface: #1a1a2e;
+      --surface2: #232340;
+      --accent: #4a8eff;
+      --text: #e8e8f0;
+      --text-dim: #8888a0;
+      --fuel: #3dd68c;
+      --toilet: #60a0ff;
+      --food: #ffaa40;
+      --danger: #ff5555;
+      --radius: 12px;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    #app {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      height: 100dvh;
+    }
+
+    /* Status Bar */
+    #status-bar {
+      background: var(--surface);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--surface2);
+      flex-shrink: 0;
+    }
+
+    #road-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    #road-name {
+      font-size: 20px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #road-detail {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-top: 2px;
+    }
+
+    #speed-display {
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    #speed-value {
+      font-size: 28px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+    }
+
+    #speed-unit {
+      font-size: 11px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+    }
+
+    #gps-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--text-dim);
+      flex-shrink: 0;
+    }
+
+    #gps-dot.good { background: var(--fuel); }
+    #gps-dot.fair { background: var(--food); }
+    #gps-dot.poor { background: var(--danger); }
+
+    /* Action Bar */
+    #action-bar {
+      display: flex;
+      gap: 8px;
+      padding: 10px 16px;
+      flex-shrink: 0;
+    }
+
+    .action-btn {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .action-btn:active { opacity: 0.7; }
+
+    #start-btn {
+      background: var(--accent);
+      color: white;
+    }
+
+    #start-btn.active {
+      background: var(--danger);
+    }
+
+    #wake-btn {
+      background: var(--surface2);
+      color: var(--text);
+      flex: 0 0 auto;
+      padding: 12px 16px;
+    }
+
+    #wake-btn.active {
+      background: var(--fuel);
+      color: #0f0f1a;
+    }
+
+    /* Stop List */
+    #stop-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 16px 16px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .stop-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .stop-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .stop-name {
+      font-size: 16px;
+      font-weight: 600;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .stop-amenities {
+      display: flex;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .amenity-badge {
+      font-size: 16px;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      background: var(--surface2);
+    }
+
+    .stop-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .stop-distance {
+      font-size: 14px;
+      color: var(--text-dim);
+    }
+
+    .stop-distance strong {
+      color: var(--text);
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .stop-eta {
+      font-size: 14px;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .navigate-btn {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      background: var(--surface2);
+      color: var(--accent);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .navigate-btn:active { opacity: 0.7; }
+
+    /* Empty / Message States */
+    #message {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+      text-align: center;
+      color: var(--text-dim);
+    }
+
+    #message .icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    #message .title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    #message .subtitle {
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* Error Banner */
+    #error-banner {
+      display: none;
+      padding: 10px 16px;
+      background: var(--danger);
+      color: white;
+      font-size: 13px;
+      font-weight: 500;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    #error-banner.visible { display: block; }
+
+    /* Footer */
+    #footer {
+      padding: 8px 16px;
+      font-size: 11px;
+      color: var(--text-dim);
+      text-align: center;
+      border-top: 1px solid var(--surface2);
+      flex-shrink: 0;
+    }
+
+    /* Loading spinner */
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid var(--surface2);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="error-banner"></div>
+
+    <div id="status-bar">
+      <div id="gps-dot"></div>
+      <div id="road-info">
+        <div id="road-name">--</div>
+        <div id="road-detail"></div>
+      </div>
+      <div id="speed-display">
+        <div id="speed-value">--</div>
+        <div id="speed-unit">km/h</div>
+      </div>
+    </div>
+
+    <div id="action-bar">
+      <button class="action-btn" id="start-btn">Start Tracking</button>
+      <button class="action-btn" id="wake-btn">Screen On</button>
+    </div>
+
+    <div id="stop-list"></div>
+
+    <div id="message">
+      <div class="icon">&#x1F697;</div>
+      <div class="title">Rest Stop Finder</div>
+      <div class="subtitle">Tap "Start Tracking" to find rest stops ahead on your route</div>
+    </div>
+
+    <div id="footer">Data &copy; <a href="https://www.openstreetmap.org/copyright" style="color:var(--text-dim)">OpenStreetMap</a> contributors</div>
+  </div>
+
+<script>
+// ============================================================
+// State
+// ============================================================
+const state = {
+  tracking: false,
+  position: null,       // { lat, lng, speed, heading, accuracy, timestamp }
+  speedSmoothed: 0,
+  watchId: null,
+  // Road identification
+  currentRoad: null,    // { ref, name, highwayType }
+  lastRoadQuery: 0,
+  lastRoadPosition: null,
+  queryingRoad: false,
+  // Forward path (road geometry ahead of user)
+  forwardPath: null,    // [{lat, lon}, ...] — polyline tracing the road ahead
+  forwardCumDist: null, // [0, d1, d2, ...] — cumulative meters along forwardPath
+  // Rest stops
+  restStops: [],        // filtered, sorted, with cached snap positions
+  rawStops: [],
+  lastStopQuery: 0,
+  queryingStops: false,
+  // UI
+  wakeLock: null,
+  wantWakeLock: false,
+  lastRenderKey: '',    // throttle: only re-render when display text changes
+};
+
+// ============================================================
+// Config
+// ============================================================
+const ROAD_QUERY_INTERVAL = 30000;    // 30s between road identification queries
+const ROAD_QUERY_DISTANCE = 500;      // or when moved 500m
+const STOP_QUERY_INTERVAL = 180000;   // 3min between rest stop queries
+const SEARCH_DISTANCE = 100000;       // 100km ahead
+const SEARCH_BBOX_RADIUS = 120000;    // bbox radius for Overpass road query
+const ROAD_SNAP_TOLERANCE = 200;      // max 200m to consider user "on" the road
+const STOP_SNAP_TOLERANCE = 3000;     // rest stops within 3km of road polyline
+const MIN_DISTANCE = 500;             // ignore stops closer than 500m
+const SPEED_ALPHA = 0.3;              // EMA smoothing factor
+const HIGHWAY_PRIORITY = ['motorway', 'trunk', 'primary', 'secondary', 'tertiary'];
+
+// ============================================================
+// Geo Utilities
+// ============================================================
+const RAD = Math.PI / 180;
+const DEG = 180 / Math.PI;
+
+function haversine(lat1, lon1, lat2, lon2) {
+  const dLat = (lat2 - lat1) * RAD;
+  const dLon = (lon2 - lon1) * RAD;
+  const a = Math.sin(dLat / 2) ** 2 +
+            Math.cos(lat1 * RAD) * Math.cos(lat2 * RAD) * Math.sin(dLon / 2) ** 2;
+  return 6371000 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function bearing(lat1, lon1, lat2, lon2) {
+  const dLon = (lon2 - lon1) * RAD;
+  const y = Math.sin(dLon) * Math.cos(lat2 * RAD);
+  const x = Math.cos(lat1 * RAD) * Math.sin(lat2 * RAD) -
+            Math.sin(lat1 * RAD) * Math.cos(lat2 * RAD) * Math.cos(dLon);
+  return (Math.atan2(y, x) * DEG + 360) % 360;
+}
+
+function angleDiff(a, b) {
+  let d = ((a - b + 180) % 360) - 180;
+  if (d < -180) d += 360;
+  return Math.abs(d);
+}
+
+function projectPoint(lat, lon, headingDeg, distanceM) {
+  const R = 6371000;
+  const brng = headingDeg * RAD;
+  const lat1 = lat * RAD;
+  const lon1 = lon * RAD;
+  const lat2 = Math.asin(
+    Math.sin(lat1) * Math.cos(distanceM / R) +
+    Math.cos(lat1) * Math.sin(distanceM / R) * Math.cos(brng)
+  );
+  const lon2 = lon1 + Math.atan2(
+    Math.sin(brng) * Math.sin(distanceM / R) * Math.cos(lat1),
+    Math.cos(distanceM / R) - Math.sin(lat1) * Math.sin(lat2)
+  );
+  return { lat: lat2 * DEG, lng: lon2 * DEG };
+}
+
+// Snap a point onto a line segment (Cartesian approx — fine for short segments)
+function snapToSegment(px, py, ax, ay, bx, by) {
+  const dx = bx - ax, dy = by - ay;
+  const lenSq = dx * dx + dy * dy;
+  let t = 0;
+  if (lenSq > 0) {
+    t = Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / lenSq));
+  }
+  return { lat: ax + t * dx, lon: ay + t * dy, t };
+}
+
+// Snap a point to the nearest position on a polyline
+function snapToPolyline(lat, lng, polyline) {
+  let bestDist = Infinity, bestSnap = null, bestSeg = 0, bestT = 0;
+  for (let i = 0; i < polyline.length - 1; i++) {
+    const s = snapToSegment(lat, lng,
+      polyline[i].lat, polyline[i].lon,
+      polyline[i + 1].lat, polyline[i + 1].lon);
+    const d = haversine(lat, lng, s.lat, s.lon);
+    if (d < bestDist) {
+      bestDist = d;
+      bestSnap = s;
+      bestSeg = i;
+      bestT = s.t;
+    }
+  }
+  return bestSnap ? { distance: bestDist, point: bestSnap, segmentIndex: bestSeg, t: bestT } : null;
+}
+
+// Precompute cumulative distances along a polyline
+function computeCumDist(path) {
+  const cum = [0];
+  for (let i = 1; i < path.length; i++) {
+    cum.push(cum[i - 1] + haversine(path[i - 1].lat, path[i - 1].lon, path[i].lat, path[i].lon));
+  }
+  return cum;
+}
+
+// Distance along polyline to a snapped point (segment index + fractional t)
+function distAlongPath(cumDist, segIndex, t) {
+  if (segIndex + 1 >= cumDist.length) return cumDist[cumDist.length - 1];
+  return cumDist[segIndex] + t * (cumDist[segIndex + 1] - cumDist[segIndex]);
+}
+
+// Compute a square bounding box around a point
+function computeSearchBBox(lat, lng, radiusM) {
+  return {
+    south: projectPoint(lat, lng, 180, radiusM).lat,
+    west: projectPoint(lat, lng, 270, radiusM).lng,
+    north: projectPoint(lat, lng, 0, radiusM).lat,
+    east: projectPoint(lat, lng, 90, radiusM).lng,
+  };
+}
+
+// ============================================================
+// GPS Module
+// ============================================================
+function startTracking() {
+  if (!navigator.geolocation) {
+    showError('Geolocation is not supported by this browser');
+    return;
+  }
+
+  state.tracking = true;
+  state.watchId = navigator.geolocation.watchPosition(
+    onPosition,
+    onPositionError,
+    { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 }
+  );
+  renderActionBar();
+  showMessage('waiting', 'Acquiring GPS Signal...', 'Make sure location services are enabled');
+}
+
+function stopTracking() {
+  if (state.watchId !== null) {
+    navigator.geolocation.clearWatch(state.watchId);
+    state.watchId = null;
+  }
+  state.tracking = false;
+  state.position = null;
+  state.currentRoad = null;
+  state.forwardPath = null;
+  state.forwardCumDist = null;
+  state.restStops = [];
+  state.rawStops = [];
+  state.queryingStops = false;
+  renderAll();
+  showMessage('idle', 'Rest Stop Finder', 'Tap "Start Tracking" to find rest stops ahead on your route');
+}
+
+function onPosition(pos) {
+  const { latitude, longitude, speed, heading, accuracy } = pos.coords;
+
+  state.position = {
+    lat: latitude,
+    lng: longitude,
+    speed: speed || 0,
+    heading: heading,
+    accuracy: accuracy,
+    timestamp: pos.timestamp,
+  };
+
+  // Smooth speed
+  if (speed !== null && speed > 0) {
+    state.speedSmoothed = state.speedSmoothed === 0
+      ? speed
+      : SPEED_ALPHA * speed + (1 - SPEED_ALPHA) * state.speedSmoothed;
+  }
+
+  renderStatusBar();
+  maybeQueryRoad();
+  maybeQueryStops();
+  updateDistancesAndETAs();
+}
+
+function onPositionError(err) {
+  if (err.code === 1) {
+    showError('Location permission denied. Please enable it in your browser settings.');
+    stopTracking();
+  } else if (err.code === 2) {
+    showError('GPS signal unavailable. Waiting...');
+  }
+}
+
+// ============================================================
+// Overpass API Helper
+// ============================================================
+const OVERPASS_URL = 'https://overpass-api.de/api/interpreter';
+
+async function queryOverpass(query) {
+  const resp = await fetch(OVERPASS_URL, {
+    method: 'POST',
+    body: `data=${encodeURIComponent(query)}`,
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+  });
+  if (!resp.ok) throw { status: resp.status };
+  return resp.json();
+}
+
+// ============================================================
+// Road Identification (via Overpass — lightweight query)
+// ============================================================
+async function maybeQueryRoad() {
+  if (!state.position || state.queryingRoad) return;
+  const now = Date.now();
+  const timeSince = now - state.lastRoadQuery;
+  const distMoved = state.lastRoadPosition
+    ? haversine(state.position.lat, state.position.lng, state.lastRoadPosition.lat, state.lastRoadPosition.lng)
+    : Infinity;
+
+  if (timeSince < ROAD_QUERY_INTERVAL && distMoved < ROAD_QUERY_DISTANCE) return;
+
+  state.queryingRoad = true;
+  state.lastRoadQuery = now;
+  state.lastRoadPosition = { lat: state.position.lat, lng: state.position.lng };
+
+  try {
+    const { lat, lng } = state.position;
+    const query = `[out:json][timeout:10];way(around:50,${lat},${lng})["highway"~"^(motorway|trunk|primary|secondary|tertiary)$"];out tags;`;
+    const data = await queryOverpass(query);
+    const ways = (data.elements || []).filter(e => e.type === 'way' && e.tags);
+
+    if (ways.length === 0) return; // keep last known road
+
+    // Pick highest-priority road class
+    ways.sort((a, b) => {
+      const ai = HIGHWAY_PRIORITY.indexOf(a.tags.highway);
+      const bi = HIGHWAY_PRIORITY.indexOf(b.tags.highway);
+      return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+    });
+
+    const best = ways[0];
+    const prevRef = state.currentRoad?.ref;
+
+    state.currentRoad = {
+      ref: best.tags.ref || null,
+      name: best.tags.name || null,
+      highwayType: best.tags.highway,
+    };
+
+    // If road ref changed, force re-query of rest stops + road geometry
+    if (state.currentRoad.ref !== prevRef) {
+      state.lastStopQuery = 0;
+      state.forwardPath = null;
+      state.forwardCumDist = null;
+    }
+
+    renderStatusBar();
+  } catch (e) {
+    if (e?.status === 429) state.lastRoadQuery = now + 120000;
+  } finally {
+    state.queryingRoad = false;
+  }
+}
+
+// ============================================================
+// Overpass — Road Geometry + Rest Stop Search (combined query)
+// ============================================================
+async function maybeQueryStops() {
+  if (!state.position || state.position.heading === null || state.queryingStops) return;
+  if (state.position.accuracy > 50) return;
+
+  const now = Date.now();
+  if (now - state.lastStopQuery < STOP_QUERY_INTERVAL) return;
+
+  state.queryingStops = true;
+  state.lastStopQuery = now;
+
+  try {
+    const { lat, lng, heading } = state.position;
+    const bbox = computeSearchBBox(lat, lng, SEARCH_BBOX_RADIUS);
+    const bboxStr = `${bbox.south},${bbox.west},${bbox.north},${bbox.east}`;
+
+    const ref = state.currentRoad?.ref;
+    const hwType = state.currentRoad?.highwayType;
+    let query;
+
+    if (ref) {
+      const escapedRef = ref.replace(/"/g, '\\"');
+      const hwFilter = hwType
+        ? `["highway"~"^(${hwType})$"]`
+        : `["highway"~"^(motorway|trunk|primary|secondary|tertiary)$"]`;
+      query = `[out:json][timeout:30];
+way["ref"="${escapedRef}"]${hwFilter}(${bboxStr}) -> .road;
+.road out geom;
+(
+  nwr["highway"="services"](around.road:${STOP_SNAP_TOLERANCE});
+  nwr["highway"="rest_area"](around.road:${STOP_SNAP_TOLERANCE});
+  nwr["amenity"="fuel"](around.road:${STOP_SNAP_TOLERANCE});
+);
+out center tags;`;
+    } else {
+      // Fallback: no ref available, broad area search
+      query = `[out:json][timeout:25];
+(
+  nwr["highway"="services"](${bboxStr});
+  nwr["highway"="rest_area"](${bboxStr});
+  nwr["amenity"="fuel"](${bboxStr});
+);
+out center tags;`;
+    }
+
+    const data = await queryOverpass(query);
+    const elements = data.elements || [];
+
+    if (ref) {
+      // Separate road-geometry ways from rest-stop elements
+      const roadWays = elements.filter(e => e.type === 'way' && e.geometry);
+      const stopEls = elements.filter(e => !e.geometry);
+
+      // Build forward polyline along the road
+      state.forwardPath = buildForwardPath(roadWays, lat, lng, heading);
+      if (state.forwardPath && state.forwardPath.length > 1) {
+        state.forwardCumDist = computeCumDist(state.forwardPath);
+      } else {
+        state.forwardPath = null;
+        state.forwardCumDist = null;
+      }
+
+      state.rawStops = parseStopElements(stopEls);
+    } else {
+      state.forwardPath = null;
+      state.forwardCumDist = null;
+      state.rawStops = parseStopElements(elements);
+    }
+
+    filterAndSortStops();
+    hideError();
+  } catch (e) {
+    if (e?.status === 429 || e?.status >= 500) {
+      state.lastStopQuery = now + 300000;
+      showError('Rest stop service busy. Retrying soon...');
+    } else if (state.rawStops.length === 0) {
+      showError('Failed to fetch rest stops. Check connection.');
+    }
+  } finally {
+    state.queryingStops = false;
+  }
+}
+
+function parseStopElements(elements) {
+  return elements.map(el => {
+    const lat = el.type === 'node' ? el.lat : el.center?.lat;
+    const lng = el.type === 'node' ? el.lon : el.center?.lon;
+    if (!lat || !lng) return null;
+
+    const tags = el.tags || {};
+    const amenities = detectAmenities(tags);
+
+    // Must have fuel or toilets
+    if (!amenities.fuel && !amenities.toilets) return null;
+
+    return {
+      id: el.id,
+      lat,
+      lng,
+      name: tags.name || tags['name:en'] || tags.description || fallbackName(tags),
+      amenities,
+      tags,
+    };
+  }).filter(Boolean);
+}
+
+function detectAmenities(tags) {
+  const isServices = tags.highway === 'services';
+  const hasFuelTag = tags.amenity === 'fuel' || Object.keys(tags).some(k => k.startsWith('fuel:'));
+  const hasToiletTag = tags.toilets === 'yes' || tags.amenity === 'toilets';
+  const hasFood = tags.amenity === 'restaurant' || tags.amenity === 'fast_food' ||
+                  tags.food === 'yes' || tags.restaurant === 'yes';
+
+  return {
+    fuel: hasFuelTag || isServices,
+    toilets: hasToiletTag || isServices,
+    food: hasFood || isServices,
+  };
+}
+
+function fallbackName(tags) {
+  if (tags.highway === 'services') return 'Service Area';
+  if (tags.highway === 'rest_area') return 'Rest Area';
+  if (tags.amenity === 'fuel') return 'Gas Station';
+  return 'Rest Stop';
+}
+
+// ============================================================
+// Forward Path Builder — traces the road polyline ahead
+// ============================================================
+// Check if a way's local direction near a point aligns with heading
+function wayMatchesHeading(geom, heading, nearLat, nearLon) {
+  // Use the segment closest to the reference point for direction check
+  let bestD = Infinity, bestI = 0;
+  for (let i = 0; i < geom.length - 1; i++) {
+    const midLat = (geom[i].lat + geom[i + 1].lat) / 2;
+    const midLon = (geom[i].lon + geom[i + 1].lon) / 2;
+    const d = (midLat - nearLat) ** 2 + (midLon - nearLon) ** 2;
+    if (d < bestD) { bestD = d; bestI = i; }
+  }
+  const segBear = bearing(geom[bestI].lat, geom[bestI].lon,
+                          geom[bestI + 1].lat, geom[bestI + 1].lon);
+  return angleDiff(heading, segBear) <= 90;
+}
+
+function buildForwardPath(roadWays, userLat, userLng, heading) {
+  if (roadWays.length === 0) return null;
+
+  let bestWay = null;
+  let bestDist = Infinity;
+  let bestSnap = null;
+
+  for (const way of roadWays) {
+    const geom = way.geometry;
+    if (!geom || geom.length < 2) continue;
+    if (!wayMatchesHeading(geom, heading, userLat, userLng)) continue;
+
+    const snap = snapToPolyline(userLat, userLng, geom);
+    if (snap && snap.distance < bestDist) {
+      bestDist = snap.distance;
+      bestWay = way;
+      bestSnap = snap;
+    }
+  }
+
+  if (!bestWay || bestDist > ROAD_SNAP_TOLERANCE) return null;
+
+  const path = [];
+  let totalDist = 0;
+
+  path.push({ lat: bestSnap.point.lat, lon: bestSnap.point.lon });
+
+  const geom = bestWay.geometry;
+  for (let i = bestSnap.segmentIndex + 1; i < geom.length; i++) {
+    const prev = path[path.length - 1];
+    totalDist += haversine(prev.lat, prev.lon, geom[i].lat, geom[i].lon);
+    path.push({ lat: geom[i].lat, lon: geom[i].lon });
+    if (totalDist >= SEARCH_DISTANCE) return path;
+  }
+
+  const usedWayIds = new Set([bestWay.id]);
+
+  while (totalDist < SEARCH_DISTANCE) {
+    const lastPt = path[path.length - 1];
+    let nextWay = null;
+    let nextDist = Infinity;
+
+    for (const way of roadWays) {
+      if (usedWayIds.has(way.id)) continue;
+      const g = way.geometry;
+      if (!g || g.length < 2) continue;
+      if (!wayMatchesHeading(g, heading, lastPt.lat, lastPt.lon)) continue;
+
+      const d = haversine(lastPt.lat, lastPt.lon, g[0].lat, g[0].lon);
+      if (d < nextDist && d < 200) {
+        nextDist = d;
+        nextWay = way;
+      }
+    }
+
+    if (!nextWay) break;
+    usedWayIds.add(nextWay.id);
+
+    for (const pt of nextWay.geometry) {
+      const prev = path[path.length - 1];
+      const d = haversine(prev.lat, prev.lon, pt.lat, pt.lon);
+      if (d > 1) {
+        totalDist += d;
+        path.push({ lat: pt.lat, lon: pt.lon });
+        if (totalDist >= SEARCH_DISTANCE) return path;
+      }
+    }
+  }
+
+  return path.length > 1 ? path : null;
+}
+
+// ============================================================
+// Filter & Sort — caches snap positions for efficiency
+// ============================================================
+function filterAndSortStops() {
+  if (!state.position) {
+    state.restStops = [];
+    renderStopList();
+    return;
+  }
+
+  const { lat, lng, heading } = state.position;
+
+  if (state.forwardPath && state.forwardCumDist) {
+    const userSnap = snapToPolyline(lat, lng, state.forwardPath);
+    const userDist = userSnap
+      ? distAlongPath(state.forwardCumDist, userSnap.segmentIndex, userSnap.t)
+      : 0;
+
+    state.restStops = state.rawStops.map(stop => {
+      const snap = snapToPolyline(stop.lat, stop.lng, state.forwardPath);
+      if (!snap || snap.distance > STOP_SNAP_TOLERANCE) return null;
+
+      const stopDist = distAlongPath(state.forwardCumDist, snap.segmentIndex, snap.t);
+      const distAhead = stopDist - userDist;
+      if (distAhead < MIN_DISTANCE || distAhead > SEARCH_DISTANCE) return null;
+
+      // Cache snap position — stops don't move, so segmentIndex/t are stable
+      return { ...stop, distance: distAhead, _snapSeg: snap.segmentIndex, _snapT: snap.t };
+    }).filter(Boolean)
+      .sort((a, b) => a.distance - b.distance)
+      .slice(0, 20);
+
+  } else if (heading !== null) {
+    state.restStops = state.rawStops.map(stop => {
+      const dist = haversine(lat, lng, stop.lat, stop.lng);
+      const bear = bearing(lat, lng, stop.lat, stop.lng);
+      if (angleDiff(heading, bear) >= 60 || dist < MIN_DISTANCE || dist > SEARCH_DISTANCE) return null;
+      return { ...stop, distance: dist };
+    }).filter(Boolean)
+      .sort((a, b) => a.distance - b.distance)
+      .slice(0, 20);
+
+  } else {
+    state.restStops = [];
+  }
+
+  renderStopList();
+}
+
+function updateDistancesAndETAs() {
+  if (!state.position || state.restStops.length === 0) return;
+
+  const { lat, lng, heading } = state.position;
+
+  if (state.forwardPath && state.forwardCumDist) {
+    // Only snap the user (O(path)); reuse cached snap positions for stops (O(1) each)
+    const userSnap = snapToPolyline(lat, lng, state.forwardPath);
+    if (!userSnap) return;
+    const userDist = distAlongPath(state.forwardCumDist, userSnap.segmentIndex, userSnap.t);
+
+    for (const stop of state.restStops) {
+      if (stop._snapSeg !== undefined) {
+        stop.distance = distAlongPath(state.forwardCumDist, stop._snapSeg, stop._snapT) - userDist;
+      }
+    }
+    state.restStops = state.restStops
+      .filter(s => s.distance > MIN_DISTANCE)
+      .sort((a, b) => a.distance - b.distance);
+
+  } else if (heading !== null) {
+    for (const stop of state.restStops) {
+      stop.distance = haversine(lat, lng, stop.lat, stop.lng);
+    }
+    state.restStops = state.restStops
+      .filter(s => {
+        const bear = bearing(lat, lng, s.lat, s.lng);
+        return angleDiff(heading, bear) < 60 && s.distance > MIN_DISTANCE;
+      })
+      .sort((a, b) => a.distance - b.distance);
+  }
+
+  renderStopList();
+}
+
+// ============================================================
+// DOM Cache
+// ============================================================
+const dom = {
+  roadName: document.getElementById('road-name'),
+  roadDetail: document.getElementById('road-detail'),
+  speedValue: document.getElementById('speed-value'),
+  gpsDot: document.getElementById('gps-dot'),
+  stopList: document.getElementById('stop-list'),
+  message: document.getElementById('message'),
+  errorBanner: document.getElementById('error-banner'),
+  startBtn: document.getElementById('start-btn'),
+  wakeBtn: document.getElementById('wake-btn'),
+};
+
+// ============================================================
+// UI Rendering
+// ============================================================
+function renderAll() {
+  renderStatusBar();
+  renderActionBar();
+  renderStopList();
+}
+
+function renderStatusBar() {
+
+  if (state.currentRoad?.ref || state.currentRoad?.name) {
+    dom.roadName.textContent = state.currentRoad.ref || state.currentRoad.name;
+    dom.roadDetail.textContent = state.currentRoad.ref && state.currentRoad.name
+      ? state.currentRoad.name
+      : (state.forwardPath ? `${Math.round(state.forwardCumDist?.[state.forwardCumDist.length - 1] / 1000 || 0)} km traced` : '');
+  } else if (state.tracking) {
+    dom.roadName.textContent = 'Detecting road...';
+    dom.roadDetail.textContent = '';
+  } else {
+    dom.roadName.textContent = '--';
+    dom.roadDetail.textContent = '';
+  }
+
+  if (state.position && state.speedSmoothed > 0.5) {
+    dom.speedValue.textContent = Math.round(state.speedSmoothed * 3.6);
+  } else {
+    dom.speedValue.textContent = '--';
+  }
+
+  dom.gpsDot.className = '';
+  if (state.position) {
+    if (state.position.accuracy < 15) dom.gpsDot.className = 'good';
+    else if (state.position.accuracy < 40) dom.gpsDot.className = 'fair';
+    else dom.gpsDot.className = 'poor';
+  }
+}
+
+function renderActionBar() {
+  if (state.tracking) {
+    dom.startBtn.textContent = 'Stop Tracking';
+    dom.startBtn.classList.add('active');
+  } else {
+    dom.startBtn.textContent = 'Start Tracking';
+    dom.startBtn.classList.remove('active');
+  }
+}
+
+function renderStopList() {
+  if (!state.tracking) {
+    dom.stopList.innerHTML = '';
+    dom.stopList.style.display = 'none';
+    dom.message.style.display = 'flex';
+    return;
+  }
+
+  if (state.restStops.length === 0) {
+    dom.stopList.innerHTML = '';
+    dom.stopList.style.display = 'none';
+
+    if (state.queryingStops) {
+      showMessage('loading', 'Searching...', 'Looking for rest stops ahead');
+    } else if (!state.position) {
+      showMessage('waiting', 'Acquiring GPS...', 'Make sure location services are enabled');
+    } else if (state.position.heading === null) {
+      showMessage('waiting', 'Start Driving', 'Direction detection requires movement');
+    } else {
+      showMessage('empty', 'No Rest Stops Found', 'No rest stops with fuel or toilets in the next 100 km');
+    }
+    return;
+  }
+
+  // Throttle: only rebuild DOM when displayed values actually change
+  const renderKey = state.restStops.map(s => `${s.id}:${(s.distance / 1000).toFixed(1)}`).join(',');
+  if (renderKey === state.lastRenderKey) return;
+  state.lastRenderKey = renderKey;
+
+  dom.message.style.display = 'none';
+  dom.stopList.style.display = 'block';
+
+  const speed = state.speedSmoothed;
+
+  dom.stopList.innerHTML = state.restStops.map(stop => {
+    const distKm = stop.distance / 1000;
+    const distStr = distKm < 1
+      ? `${Math.round(stop.distance)} m`
+      : `${distKm.toFixed(1)} km`;
+
+    let etaStr = '--';
+    if (speed > 1.4) {
+      const etaMin = Math.round(stop.distance / speed / 60);
+      if (etaMin < 60) {
+        etaStr = `~${etaMin} min`;
+      } else {
+        const h = Math.floor(etaMin / 60);
+        const m = etaMin % 60;
+        etaStr = `~${h}h ${m}m`;
+      }
+    }
+
+    const amenityBadges = [];
+    if (stop.amenities.fuel) amenityBadges.push('<span class="amenity-badge" title="Fuel">&#x26FD;</span>');
+    if (stop.amenities.toilets) amenityBadges.push('<span class="amenity-badge" title="Toilets">&#x1F6BB;</span>');
+    if (stop.amenities.food) amenityBadges.push('<span class="amenity-badge" title="Food">&#x1F374;</span>');
+
+    const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${stop.lat},${stop.lng}&travelmode=driving`;
+
+    return `<div class="stop-card">
+      <div class="stop-header">
+        <div class="stop-name">${escapeHtml(stop.name)}</div>
+        <div class="stop-amenities">${amenityBadges.join('')}</div>
+      </div>
+      <div class="stop-meta">
+        <div class="stop-distance"><strong>${distStr}</strong> ahead</div>
+        <div class="stop-eta">${etaStr}</div>
+      </div>
+      <a class="navigate-btn" href="${mapsUrl}" target="_blank" rel="noopener">Navigate in Google Maps &#x2192;</a>
+    </div>`;
+  }).join('');
+}
+
+function showMessage(type, title, subtitle) {
+  dom.stopList.style.display = 'none';
+  dom.message.style.display = 'flex';
+
+  let icon = '&#x1F697;';
+  let extra = '';
+  if (type === 'loading') {
+    icon = '';
+    extra = '<div class="spinner"></div>';
+  } else if (type === 'waiting') {
+    icon = '&#x1F4E1;';
+  } else if (type === 'empty') {
+    icon = '&#x1F6E3;';
+  }
+
+  dom.message.innerHTML = `
+    ${extra}
+    ${icon ? `<div class="icon">${icon}</div>` : ''}
+    <div class="title">${title}</div>
+    <div class="subtitle">${subtitle}</div>
+  `;
+}
+
+function escapeHtml(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// ============================================================
+// Error Banner
+// ============================================================
+let errorTimeout = null;
+
+function showError(msg) {
+  dom.errorBanner.textContent = msg;
+  dom.errorBanner.classList.add('visible');
+  clearTimeout(errorTimeout);
+  errorTimeout = setTimeout(hideError, 10000);
+}
+
+function hideError() {
+  dom.errorBanner.classList.remove('visible');
+}
+
+// ============================================================
+// Wake Lock
+// ============================================================
+function updateWakeBtn(active) {
+  dom.wakeBtn.classList.toggle('active', active);
+}
+
+async function toggleWakeLock() {
+  if (state.wakeLock) {
+    state.wantWakeLock = false;
+    await state.wakeLock.release();
+    state.wakeLock = null;
+    updateWakeBtn(false);
+    return;
+  }
+
+  if (!('wakeLock' in navigator)) {
+    showError('Screen Wake Lock not supported in this browser');
+    return;
+  }
+
+  state.wantWakeLock = true;
+  try {
+    state.wakeLock = await navigator.wakeLock.request('screen');
+    state.wakeLock.addEventListener('release', () => {
+      state.wakeLock = null;
+    });
+    updateWakeBtn(true);
+  } catch (e) {
+    showError('Could not keep screen on');
+    state.wantWakeLock = false;
+  }
+}
+
+// Re-acquire wake lock when page becomes visible (lock auto-releases on hide)
+document.addEventListener('visibilitychange', async () => {
+  if (document.visibilityState === 'visible' && state.wantWakeLock && !state.wakeLock) {
+    try {
+      state.wakeLock = await navigator.wakeLock.request('screen');
+      state.wakeLock.addEventListener('release', () => { state.wakeLock = null; });
+    } catch (e) { /* ignore */ }
+  }
+});
+
+// ============================================================
+// Event Handlers
+// ============================================================
+dom.startBtn.addEventListener('click', () => {
+  state.tracking ? stopTracking() : startTracking();
+});
+
+dom.wakeBtn.addEventListener('click', toggleWakeLock);
+
+// ============================================================
+// HTTPS Check
+// ============================================================
+if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+  showMessage('idle', 'HTTPS Required', 'This app needs HTTPS for GPS access. Please serve over HTTPS.');
+  dom.startBtn.disabled = true;
+}
+</script>
+</body>
+</html>
